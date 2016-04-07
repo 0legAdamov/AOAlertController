@@ -8,17 +8,41 @@
 
 import UIKit
 
+class AOAlertAction {
+    
+    init(title: String, handler: (() -> Void)?) {
+        
+    }
+}
+
 
 class AOAlertController: UIViewController {
 
-    private let containerSize = CGSize(width: 270, height: 104)
-    private let actionItemHeight: CGFloat = 44
-    private var container = UIView()
+    
     
     init() {
         super.init(nibName: nil, bundle: nil)
         self.modalPresentationStyle = .OverCurrentContext
     }
+    
+    
+    func presentOn(viewController: UIViewController?) {
+        guard let parentController = viewController else {
+            print("Parent ViewController is nil!")
+            return
+        }
+        parentController.presentViewController(self, animated: false) { [weak self] in
+            self?.showUp()
+        }
+    }
+
+    
+    //MARK: - Private 
+    
+    private let containerSize = CGSize(width: 270, height: 104)
+    private let actionItemHeight: CGFloat = 44
+    private var container = UIView()
+    private var actions = [AOAlertAction]()
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -36,20 +60,6 @@ class AOAlertController: UIViewController {
         self.view.alpha = 0
         self.configureContainer()
     }
-    
-    
-    func presentOn(viewController: UIViewController?) {
-        guard let parentController = viewController else {
-            print("Parent ViewController is nil!")
-            return
-        }
-        parentController.presentViewController(self, animated: false) { [weak self] in
-            self?.showUp()
-        }
-    }
-
-    
-    //MARK: - Private 
     
     private func configureContainer() {
         //  white rounded rectangle
