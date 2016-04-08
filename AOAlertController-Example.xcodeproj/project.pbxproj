@@ -11,7 +11,6 @@
 		42DC4AD71CB71AE000E8D32B /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42DC4AD61CB71AE000E8D32B /* ViewController.swift */; };
 		42DC4ADA1CB71AE000E8D32B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 42DC4AD81CB71AE000E8D32B /* Main.storyboard */; };
 		42DC4ADC1CB71AE000E8D32B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 42DC4ADB1CB71AE000E8D32B /* Assets.xcassets */; };
-		42DC4AE71CB71B1600E8D32B /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 42DC4AE61CB71B1600E8D32B /* Default-568h@2x.png */; };
 		42DC4AEA1CB71BEB00E8D32B /* AOAlertController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42DC4AE91CB71BEB00E8D32B /* AOAlertController.swift */; };
 /* End PBXBuildFile section */
 
@@ -22,7 +21,6 @@
 		42DC4AD91CB71AE000E8D32B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		42DC4ADB1CB71AE000E8D32B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		42DC4AE01CB71AE000E8D32B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		42DC4AE61CB71B1600E8D32B /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default-568h@2x.png"; path = "../Default-568h@2x.png"; sourceTree = "<group>"; };
 		42DC4AE91CB71BEB00E8D32B /* AOAlertController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AOAlertController.swift; path = Source/AOAlertController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -57,7 +55,6 @@
 		42DC4AD31CB71AE000E8D32B /* AOAlertController-Example */ = {
 			isa = PBXGroup;
 			children = (
-				42DC4AE61CB71B1600E8D32B /* Default-568h@2x.png */,
 				42DC4AD41CB71AE000E8D32B /* AppDelegate.swift */,
 				42DC4AD61CB71AE000E8D32B /* ViewController.swift */,
 				42DC4AD81CB71AE000E8D32B /* Main.storyboard */,
@@ -135,7 +132,6 @@
 			files = (
 				42DC4ADC1CB71AE000E8D32B /* Assets.xcassets in Resources */,
 				42DC4ADA1CB71AE000E8D32B /* Main.storyboard in Resources */,
-				42DC4AE71CB71B1600E8D32B /* Default-568h@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -253,6 +249,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = "Brand Assets";
 				INFOPLIST_FILE = "AOAlertController-Example/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -265,6 +262,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = "Brand Assets";
 				INFOPLIST_FILE = "AOAlertController-Example/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
