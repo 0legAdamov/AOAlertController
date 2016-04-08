@@ -12,7 +12,6 @@ class ViewController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
     }
 
     override func didReceiveMemoryWarning() {
@@ -22,23 +21,17 @@ class ViewController: UITableViewController {
 
 
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        print("did select")
         if indexPath.section == 0 {
             switch indexPath.row {
             case 0:
                 self.showDefault()
             case 1:
-                self.test()
+                break
             default:
                 break
             }
         }
-    }
-    
-    func test() {
-        let alert = UIAlertController(title: "title", message: "wrqwrqwr\nwew\nwef", preferredStyle: .Alert)
-        
-        self.navigationController?.presentViewController(alert, animated: true, completion: nil)
+        self.tableView.deselectRowAtIndexPath(indexPath, animated: true)
     }
     
     func showDefault() {
@@ -49,10 +42,13 @@ class ViewController: UITableViewController {
         let action2 = AOAlertAction(title: "Two") {
             print("! action 2 pressed")
         }
+        let action3 = AOAlertAction(title: "Two") {
+            print("! action 3 pressed")
+        }
         alert.addAction(action1)
         alert.addAction(action2)
-//        alert.addAction(action2)
-        alert.presentOn(self.navigationController)
+        alert.addAction(action3)
+        self.navigationController?.presentViewController(alert, animated: false, completion: nil)
     }
     
 }

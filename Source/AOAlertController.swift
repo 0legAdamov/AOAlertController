@@ -33,7 +33,7 @@ class AOAlertAction {
         button.titleLabel?.font = f
         button.setTitleColor(UIColor.blackColor(), forState: .Normal)
         button.setTitle(self.title, forState: .Normal)
-        button.addTarget(self, action: "buttonPressed", forControlEvents: .TouchUpInside)
+        button.addTarget(self, action: #selector(AOAlertAction.buttonPressed), forControlEvents: .TouchUpInside)
         self.completion = completion
         parentView.addSubview(button)
     }
@@ -73,7 +73,6 @@ class AOAlertController: UIViewController {
     }
 
     
-    
     init(title: String?, message: String?, style: AOAlertControllerStyle) {
         self.alertTitle = title
         self.message = message
@@ -86,30 +85,12 @@ class AOAlertController: UIViewController {
     func addAction(action: AOAlertAction) {
         self.actions.append(action)
     }
-    
-    
-    func presentOn(viewController: UIViewController?) {
-        guard let parentController = viewController else {
-            print("Parent ViewController is nil!")
-            return
-        }
-        if self.alertTitle == nil && self.message == nil {
-            print("No text")
-            return
-        }
-        
-        self.configureContainer()
-        print("presenting...")
-        parentController.presentViewController(self, animated: false) { [weak self] in
-            self?.showUp()
-        }
-    }
 
     
     //MARK: - Private 
     
     private let style: AOAlertControllerStyle
-    private let alertTitle: String?
+    private var alertTitle: String?
     private let message: String?
     private let containerWidth: CGFloat = 270
     private let contentOffset: CGFloat = 4
@@ -134,6 +115,19 @@ class AOAlertController: UIViewController {
         
         self.view.backgroundColor = UIColor.blackColor().colorWithAlphaComponent(0.4)
         self.view.alpha = 0
+        
+        if self.alertTitle == nil && self.message == nil {
+            print("No text")
+            self.alertTitle = " "
+        }
+        
+        self.configureContainer()
+    }
+    
+    
+    override func viewDidAppear(animated: Bool) {
+        super.viewDidAppear(animated)
+        self.showUp()
     }
     
     
@@ -215,8 +209,8 @@ class AOAlertController: UIViewController {
     
     
     private func showUp() {
-        UIView.animateWithDuration(0.2, animations: { 
-            self.view.alpha = 1
+        UIView.animateWithDuration(0.2, delay: 0, options: .CurveEaseInOut, animations: { [weak self] in
+            self?.view.alpha = 1
             }, completion: nil)
         UIView.animateWithDuration(0.4, delay: 0.2, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.2, options: .CurveEaseInOut, animations: {
             self.container.alpha = 1
@@ -232,7 +226,7 @@ class AOAlertController: UIViewController {
             }, completion: nil)
         UIView.animateWithDuration(0.2, delay: 0.2, options: .CurveEaseInOut, animations: {
             self.view.alpha = 0
-            }) { [weak self] _ in
+        }) { [weak self]_ in
                 self?.dismissViewControllerAnimated(false, completion: nil)
         }
     }
@@ -266,10 +260,6 @@ class AOAlertController: UIViewController {
         label.font = f
         label.text = t
         return label
-    }
-    
-    deinit {
-        print("deinit alert controller")
     }
     
 }
