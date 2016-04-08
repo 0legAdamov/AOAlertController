@@ -24,15 +24,22 @@ class ViewController: UITableViewController {
         if indexPath.section == 0 {
             switch indexPath.row {
             case 0:
-                self.showDefault()
+                self.withoutActions()
             case 1:
-                break
+                self.showDefault()
             default:
                 break
             }
         }
         self.tableView.deselectRowAtIndexPath(indexPath, animated: true)
     }
+    
+    
+    func withoutActions() {
+        let alert = AOAlertController(title: "No actions", message: "Tap around the alert", style: .Alert)
+        self.navigationController?.presentViewController(alert, animated: false, completion: nil)
+    }
+    
     
     func showDefault() {
         let alert = AOAlertController(title: "Title", message: "Message", style: .Alert)

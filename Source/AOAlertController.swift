@@ -10,6 +10,8 @@ import UIKit
 
 class AOAlertAction {
     
+    var textColor: UIColor?
+    var font: UIFont?
     
     init(title: String, handler: (() -> Void)?) {
         self.title = title
@@ -19,19 +21,20 @@ class AOAlertAction {
     
     // MARK: - Private
     
-    private let handler: (() -> Void)?
     private let title: String
+    private let handler: (() -> Void)?
     private var completion: (() -> Void)?
     
-    private func drawOnView(parentView: UIView, frame: CGRect, font: UIFont?, completion: () -> Void) {
-        guard let f = font else {
+    private func drawOnView(parentView: UIView, frame: CGRect, font: UIFont?, color: UIColor, completion: () -> Void) {
+        let textFont = self.font == nil ? font : self.font
+        guard let f = textFont else {
             print("Error: no font for action item: \(self.title)")
             return
         }
         
         let button = UIButton(frame: frame)
         button.titleLabel?.font = f
-        button.setTitleColor(UIColor.blackColor(), forState: .Normal)
+        button.setTitleColor(self.textColor ?? color, forState: .Normal)
         button.setTitle(self.title, forState: .Normal)
         button.addTarget(self, action: #selector(AOAlertAction.buttonPressed), forControlEvents: .TouchUpInside)
         self.completion = completion
@@ -55,18 +58,23 @@ enum AOAlertControllerStyle {
 
 class AOAlertController: UIViewController {
     
+    var actionItemHeight: CGFloat = 44
+    var backgroundColor = UIColor.whiteColor()
     var linesColor = UIColor(red: 0.8, green: 0.8, blue: 0.81, alpha: 1)
+    var titleColor = UIColor.blackColor()
     var titleFont: UIFont? = UIFont.systemFontOfSize(18) {
         didSet {
             if titleFont == nil { print("Error: title font is nil!") }
         }
     }
+    var messageColor = UIColor.darkGrayColor()
     var messageFont: UIFont? = UIFont.systemFontOfSize(14) {
         didSet {
             if messageFont == nil { print("Error: message font is nil!") }
         }
     }
-    var actionsFont: UIFont? = UIFont.systemFontOfSize(16) {
+    var defaultActionItemColor = UIColor.blackColor()
+    var defaultActionsFont: UIFont? = UIFont.systemFontOfSize(16) {
         didSet {
             if messageFont == nil { print("Error: actions font is nil!") }
         }
@@ -95,7 +103,6 @@ class AOAlertController: UIViewController {
     private let containerWidth: CGFloat = 270
     private let contentOffset: CGFloat = 4
     private let containerMinHeight: CGFloat = 60
-    private let actionItemHeight: CGFloat = 44
     private var container = UIView()
     private var actions = [AOAlertAction]()
     
@@ -121,7 +128,20 @@ class AOAlertController: UIViewController {
             self.alertTitle = " "
         }
         
+        if self.actions.count == 0 {
+            let tapGest = UITapGestureRecognizer(target: self, action: #selector(AOAlertController.didTapBackground(_:)))
+            self.view.addGestureRecognizer(tapGest)
+        }
+        
         self.configureContainer()
+    }
+    
+    
+    @objc private func didTapBackground(gesture: UITapGestureRecognizer) {
+        let location = gesture.locationInView(self.view)
+        if !CGRectContainsPoint(self.container.frame, location) {
+            self.hideAndDismiss()
+        }
     }
     
     
@@ -142,7 +162,7 @@ class AOAlertController: UIViewController {
         //  white rounded rectangle
         let cFrame = CGRect(x: round((UIScreen.mainScreen().bounds.width - self.containerWidth)/2), y: round((UIScreen.mainScreen().bounds.height - allHeight)/2), width: self.containerWidth, height: allHeight)
         self.container = UIView(frame: cFrame)
-        self.container.backgroundColor = UIColor.whiteColor()
+        self.container.backgroundColor = self.backgroundColor
         self.container.layer.cornerRadius = 11
         self.container.alpha = 0
         self.container.transform = CGAffineTransformMakeScale(0.5, 0.5)
@@ -152,13 +172,14 @@ class AOAlertController: UIViewController {
         //  text box
         let titleYOffset = messageHeight == 0 ? (textBoxHeight - titleHeight)/2 : (textBoxHeight - titleHeight - messageHeight - self.contentOffset)/2
         let titleFrame = CGRect(x: self.contentOffset, y: titleYOffset, width: self.containerWidth - 2 * self.contentOffset, height: titleHeight)
-        if let titleLabel = self.labelInFrame(titleFrame, text: alertTitle, font: titleFont) {
+        if let titleLabel = self.labelInFrame(titleFrame, text: alertTitle, font: titleFont, textColor: self.titleColor) {
+            
             self.container.addSubview(titleLabel)
         }
         
         let messageYOffset = titleHeight == 0 ? (textBoxHeight - messageHeight)/2 : (titleYOffset + titleHeight + self.contentOffset)
         let messageFrame = CGRect(x: self.contentOffset, y: messageYOffset, width: self.containerWidth - 2 * self.contentOffset, height: messageHeight)
-        if let messageLabel = self.labelInFrame(messageFrame, text: message, font: messageFont) {
+        if let messageLabel = self.labelInFrame(messageFrame, text: message, font: messageFont, textColor: self.messageColor) {
             self.container.addSubview(messageLabel)
         }
         
@@ -180,7 +201,7 @@ class AOAlertController: UIViewController {
         //  horizontal lines
         if self.actions.count > 2 {
             for i in 1..<self.actions.count {
-                let lFrame = CGRect(x: 0, y: textBoxHeight + CGFloat(i) * self.actionItemHeight, width: containerWidth, height: 0.5)
+                let lFrame = CGRect(x: 0, y: textBoxHeight + CGFloat(i) * actionItemHeight, width: containerWidth, height: 0.5)
                 let line = UIView(frame: lFrame)
                 line.backgroundColor = self.linesColor
                 self.container.addSubview(line)
@@ -192,7 +213,7 @@ class AOAlertController: UIViewController {
             for i in 0..<self.actions.count {
                 let frame = CGRect(x: contentOffset + CGFloat(i) * containerWidth * 0.5, y: textBoxHeight + contentOffset, width: containerWidth * 0.5 - 2 * contentOffset, height: actionItemHeight - 2 * contentOffset)
                 let action = self.actions[i]
-                action.drawOnView(container, frame: frame, font: self.actionsFont, completion: { [weak self] in
+                action.drawOnView(container, frame: frame, font: defaultActionsFont, color: defaultActionItemColor, completion: { [weak self] in
                     self?.hideAndDismiss()
                 })
             }
@@ -200,11 +221,12 @@ class AOAlertController: UIViewController {
             for i in 0..<self.actions.count {
                 let frame = CGRect(x: contentOffset, y: textBoxHeight + CGFloat(i) * actionItemHeight + contentOffset, width: containerWidth - 2 * contentOffset, height: actionItemHeight - 2 * contentOffset)
                 let action = self.actions[i]
-                action.drawOnView(container, frame: frame, font: self.actionsFont, completion: { [weak self] in
+                action.drawOnView(container, frame: frame, font: defaultActionsFont, color: defaultActionItemColor, completion: { [weak self] in
                     self?.hideAndDismiss()
                 })
             }
         }
+        
     }
     
     
@@ -248,13 +270,14 @@ class AOAlertController: UIViewController {
     }
     
     
-    private func labelInFrame(frame: CGRect, text: String?, font: UIFont?) -> UILabel? {
+    private func labelInFrame(frame: CGRect, text: String?, font: UIFont?, textColor: UIColor) -> UILabel? {
         guard let f = font else { return nil }
         guard let t = text else { return nil }
         if frame.size.height == 0 { return nil }
         
         let label = UILabel(frame: frame)
         label.numberOfLines = 0
+        label.textColor = textColor
         label.lineBreakMode = NSLineBreakMode.ByWordWrapping
         label.textAlignment = .Center
         label.font = f
