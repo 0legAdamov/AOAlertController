@@ -52,7 +52,7 @@ class AOAlertAction {
 
 
 enum AOAlertControllerStyle {
-    case Alert
+    case Alert, ActionSheet
 }
 
 

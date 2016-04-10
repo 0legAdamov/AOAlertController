@@ -26,7 +26,7 @@ class ViewController: UITableViewController {
             case 0:
                 self.withoutActions()
             case 1:
-                self.showDefault()
+                self.showWithOneAction()
             default:
                 break
             }
@@ -41,20 +41,12 @@ class ViewController: UITableViewController {
     }
     
     
-    func showDefault() {
+    func showWithOneAction() {
         let alert = AOAlertController(title: "Title", message: "Message", style: .Alert)
-        let action1 = AOAlertAction(title: "One") {
+        let action = AOAlertAction(title: "Done") {
             print("! action 1 pressed")
         }
-        let action2 = AOAlertAction(title: "Two") {
-            print("! action 2 pressed")
-        }
-        let action3 = AOAlertAction(title: "Two") {
-            print("! action 3 pressed")
-        }
-        alert.addAction(action1)
-        alert.addAction(action2)
-        alert.addAction(action3)
+        alert.addAction(action)
         self.navigationController?.presentViewController(alert, animated: false, completion: nil)
     }
     
