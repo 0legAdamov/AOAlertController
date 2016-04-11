@@ -9,9 +9,31 @@
 import UIKit
 
 
+class AOAlertSettings {
+    
+    static let sharedSettings = AOAlertSettings()
+    
+    var titleTextFont          = UIFont.systemFontOfSize(18)
+    var messageTextFont        = UIFont.systemFontOfSize(14)
+    var defaultActionFont      = UIFont.systemFontOfSize(16)
+    var cancelActionFont       = UIFont.systemFontOfSize(16)
+    var destructiveActionFont  = UIFont.systemFontOfSize(16)
+    
+    var backgroundColor    = UIColor.whiteColor()
+    var linesColor       = UIColor(red: 0.8, green: 0.8, blue: 0.81, alpha: 1)
+    var titleTextColor     = UIColor.blackColor()
+    var messageTextColor    = UIColor.darkGrayColor()
+    var defaultActionColor    = UIColor.blackColor()
+    var destructiveActionColor = UIColor.redColor()
+    var cancelActionColor      = UIColor.blueColor()
+}
+
+
+
 enum AOAlertActionStyle {
     case Default, Destructive, Cancel
 }
+
 
 class AOAlertAction {
     
@@ -32,19 +54,16 @@ class AOAlertAction {
     private let handler: (() -> Void)?
     private var completion: (() -> Void)?
     
-    private func drawOnView(parentView: UIView, frame: CGRect, font: UIFont?, color: UIColor, completion: () -> Void) {
-        let textFont = self.font == nil ? font : self.font
-        guard let f = textFont else {
-            print("Error: no font for action item: \(self.title)")
-            return
-        }
+    private func drawOnView(parentView: UIView, frame: CGRect, completion: () -> Void) {
+        let textFont  = self.font      ?? self.textFontByStyle()
+        let textColor = self.textColor ?? self.textColorByStyle()
         
         let button = UIButton(frame: frame)
-        button.titleLabel?.font = f
-        button.setTitleColor(self.textColor ?? color, forState: .Normal)
+        button.titleLabel?.font = textFont
+        button.setTitleColor(textColor, forState: .Normal)
         button.setTitle(self.title, forState: .Normal)
-//        button.addTarget(self, action: #selector(AOAlertAction.buttonPressed), forControlEvents: .TouchUpInside)
-        button.addTarget(self, action: "buttonPressed", forControlEvents: .TouchUpInside)
+        button.addTarget(self, action: #selector(AOAlertAction.buttonPressed), forControlEvents: .TouchUpInside)
+//        button.addTarget(self, action: "buttonPressed", forControlEvents: .TouchUpInside)
         self.completion = completion
         parentView.addSubview(button)
     }
@@ -53,6 +72,24 @@ class AOAlertAction {
     @objc private func buttonPressed() {
         self.handler?()
         self.completion?()
+    }
+    
+    
+    private func textColorByStyle() -> UIColor {
+        switch self.style {
+        case .Cancel:      return AOAlertSettings.sharedSettings.cancelActionColor
+        case .Default:     return AOAlertSettings.sharedSettings.defaultActionColor
+        case .Destructive: return AOAlertSettings.sharedSettings.destructiveActionColor
+        }
+    }
+    
+    
+    private func textFontByStyle() ->UIFont {
+        switch  self.style {
+        case .Cancel:      return AOAlertSettings.sharedSettings.cancelActionFont
+        case .Default:     return AOAlertSettings.sharedSettings.defaultActionFont
+        case .Destructive: return AOAlertSettings.sharedSettings.destructiveActionFont
+        }
     }
     
 }
@@ -67,24 +104,24 @@ enum AOAlertControllerStyle {
 class AOAlertController: UIViewController {
     
     var actionItemHeight: CGFloat = 44
-    var backgroundColor = UIColor.whiteColor()
-    var linesColor = UIColor(red: 0.8, green: 0.8, blue: 0.81, alpha: 1)
-    var titleColor = UIColor.blackColor()
-    var titleFont: UIFont? = UIFont.systemFontOfSize(18) {
+    var backgroundColor: UIColor?
+    var linesColor: UIColor?
+    var titleColor: UIColor?
+    var titleFont: UIFont? {
         didSet {
             if titleFont == nil { print("Error: title font is nil!") }
         }
     }
-    var messageColor = UIColor.darkGrayColor()
-    var messageFont: UIFont? = UIFont.systemFontOfSize(14) {
+    var messageColor: UIColor?
+    var messageFont: UIFont? {
         didSet {
             if messageFont == nil { print("Error: message font is nil!") }
         }
     }
-    var defaultActionItemColor = UIColor.blackColor()
-    var defaultActionsFont: UIFont? = UIFont.systemFontOfSize(16) {
+    var actionItemsColor = UIColor.blackColor()
+    var actionItemsFont: UIFont? {
         didSet {
-            if messageFont == nil { print("Error: actions font is nil!") }
+            if actionItemsFont == nil { print("Error: actions font is nil!") }
         }
     }
 
@@ -137,8 +174,8 @@ class AOAlertController: UIViewController {
         }
         
         if self.actions.count == 0 {
-//            let tapGest = UITapGestureRecognizer(target: self, action: #selector(AOAlertController.didTapBackground(_:)))
-            let tapGest = UITapGestureRecognizer(target: self, action: "didTapBackground:")
+            let tapGest = UITapGestureRecognizer(target: self, action: #selector(AOAlertController.didTapBackground(_:)))
+//            let tapGest = UITapGestureRecognizer(target: self, action: "didTapBackground:")
             self.view.addGestureRecognizer(tapGest)
         }
         
@@ -161,6 +198,8 @@ class AOAlertController: UIViewController {
     
     
     private func configureContainer() {
+//        let titleFont         !!
+        
         // heights
         let titleHeight = self.prefferedLabelHeight(text: self.alertTitle, font: self.titleFont, width: self.containerWidth - 2 * self.contentOffset)
         let messageHeight = self.prefferedLabelHeight(text: self.message, font: self.messageFont, width: self.containerWidth - 2 * self.contentOffset)
