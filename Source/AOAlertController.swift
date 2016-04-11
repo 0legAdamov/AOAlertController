@@ -8,13 +8,19 @@
 
 import UIKit
 
+
+enum AOAlertActionStyle {
+    case Default, Destructive, Cancel
+}
+
 class AOAlertAction {
     
     var textColor: UIColor?
     var font: UIFont?
     
-    init(title: String, handler: (() -> Void)?) {
+    init(title: String, style: AOAlertActionStyle, handler: (() -> Void)?) {
         self.title = title
+        self.style = style
         self.handler = handler
     }
     
@@ -22,6 +28,7 @@ class AOAlertAction {
     // MARK: - Private
     
     private let title: String
+    private let style: AOAlertActionStyle
     private let handler: (() -> Void)?
     private var completion: (() -> Void)?
     
@@ -36,7 +43,8 @@ class AOAlertAction {
         button.titleLabel?.font = f
         button.setTitleColor(self.textColor ?? color, forState: .Normal)
         button.setTitle(self.title, forState: .Normal)
-        button.addTarget(self, action: #selector(AOAlertAction.buttonPressed), forControlEvents: .TouchUpInside)
+//        button.addTarget(self, action: #selector(AOAlertAction.buttonPressed), forControlEvents: .TouchUpInside)
+        button.addTarget(self, action: "buttonPressed", forControlEvents: .TouchUpInside)
         self.completion = completion
         parentView.addSubview(button)
     }
@@ -129,7 +137,8 @@ class AOAlertController: UIViewController {
         }
         
         if self.actions.count == 0 {
-            let tapGest = UITapGestureRecognizer(target: self, action: #selector(AOAlertController.didTapBackground(_:)))
+//            let tapGest = UITapGestureRecognizer(target: self, action: #selector(AOAlertController.didTapBackground(_:)))
+            let tapGest = UITapGestureRecognizer(target: self, action: "didTapBackground:")
             self.view.addGestureRecognizer(tapGest)
         }
         
