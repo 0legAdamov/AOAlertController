@@ -55,7 +55,7 @@ class AOAlertAction {
     private var completion: (() -> Void)?
     
     private func drawOnView(parentView: UIView, frame: CGRect, completion: () -> Void) {
-        let textFont  = self.font      ?? self.textFontByStyle()
+        let textFont  = self.font  ?? self.textFontByStyle()
         let textColor = self.color ?? self.textColorByStyle()
         
         let button = UIButton(frame: frame)
