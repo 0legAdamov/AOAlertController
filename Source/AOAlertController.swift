@@ -13,19 +13,19 @@ class AOAlertSettings {
     
     static let sharedSettings = AOAlertSettings()
     
-    var titleTextFont          = UIFont.systemFontOfSize(18)
-    var messageTextFont        = UIFont.systemFontOfSize(14)
+    var titleFont              = UIFont.systemFontOfSize(16, weight: UIFontWeightMedium)
+    var messageFont            = UIFont.systemFontOfSize(13)
     var defaultActionFont      = UIFont.systemFontOfSize(16)
-    var cancelActionFont       = UIFont.systemFontOfSize(16)
+    var cancelActionFont       = UIFont.systemFontOfSize(16, weight: UIFontWeightMedium)
     var destructiveActionFont  = UIFont.systemFontOfSize(16)
     
-    var backgroundColor    = UIColor.whiteColor()
-    var linesColor       = UIColor(red: 0.8, green: 0.8, blue: 0.81, alpha: 1)
-    var titleTextColor     = UIColor.blackColor()
-    var messageTextColor    = UIColor.darkGrayColor()
-    var defaultActionColor    = UIColor.blackColor()
-    var destructiveActionColor = UIColor.redColor()
-    var cancelActionColor      = UIColor.blueColor()
+    var backgroundColor        = UIColor(red: 0.98, green: 0.98, blue: 0.98, alpha: 1)
+    var linesColor             = UIColor(red: 0.8, green: 0.8, blue: 0.81, alpha: 1)
+    var titleColor             = UIColor.blackColor()
+    var messageColor           = UIColor.blackColor()
+    var defaultActionColor     = UIColor(red: 0, green: 0.48, blue: 1, alpha: 1)
+    var destructiveActionColor = UIColor(red: 1, green: 0.23, blue: 0.19, alpha: 1)
+    var cancelActionColor      = UIColor(red: 0, green: 0.48, blue: 1, alpha: 1)
 }
 
 
@@ -37,7 +37,7 @@ enum AOAlertActionStyle {
 
 class AOAlertAction {
     
-    var textColor: UIColor?
+    var color: UIColor?
     var font: UIFont?
     
     init(title: String, style: AOAlertActionStyle, handler: (() -> Void)?) {
@@ -56,14 +56,14 @@ class AOAlertAction {
     
     private func drawOnView(parentView: UIView, frame: CGRect, completion: () -> Void) {
         let textFont  = self.font      ?? self.textFontByStyle()
-        let textColor = self.textColor ?? self.textColorByStyle()
+        let textColor = self.color ?? self.textColorByStyle()
         
         let button = UIButton(frame: frame)
         button.titleLabel?.font = textFont
         button.setTitleColor(textColor, forState: .Normal)
         button.setTitle(self.title, forState: .Normal)
-        button.addTarget(self, action: #selector(AOAlertAction.buttonPressed), forControlEvents: .TouchUpInside)
-//        button.addTarget(self, action: "buttonPressed", forControlEvents: .TouchUpInside)
+//        button.addTarget(self, action: #selector(AOAlertAction.buttonPressed), forControlEvents: .TouchUpInside)
+        button.addTarget(self, action: "buttonPressed", forControlEvents: .TouchUpInside)
         self.completion = completion
         parentView.addSubview(button)
     }
@@ -118,12 +118,6 @@ class AOAlertController: UIViewController {
             if messageFont == nil { print("Error: message font is nil!") }
         }
     }
-    var actionItemsColor = UIColor.blackColor()
-    var actionItemsFont: UIFont? {
-        didSet {
-            if actionItemsFont == nil { print("Error: actions font is nil!") }
-        }
-    }
 
     
     init(title: String?, message: String?, style: AOAlertControllerStyle) {
@@ -174,9 +168,13 @@ class AOAlertController: UIViewController {
         }
         
         if self.actions.count == 0 {
-            let tapGest = UITapGestureRecognizer(target: self, action: #selector(AOAlertController.didTapBackground(_:)))
-//            let tapGest = UITapGestureRecognizer(target: self, action: "didTapBackground:")
+//            let tapGest = UITapGestureRecognizer(target: self, action: #selector(AOAlertController.didTapBackground(_:)))
+            let tapGest = UITapGestureRecognizer(target: self, action: "didTapBackground:")
             self.view.addGestureRecognizer(tapGest)
+        }
+        
+        if self.actions.count > 1 {
+            self.sortActions()
         }
         
         self.configureContainer()
@@ -198,11 +196,17 @@ class AOAlertController: UIViewController {
     
     
     private func configureContainer() {
-//        let titleFont         !!
+        let sharedSettings = AOAlertSettings.sharedSettings
+        let titleFont  = self.titleFont ?? sharedSettings.titleFont
+        let titleColor = self.titleColor ?? sharedSettings.titleColor
+        let messageFont = self.messageFont ?? sharedSettings.messageFont
+        let messageColor = self.messageColor ?? sharedSettings.messageColor
+        let backColor = self.backgroundColor ?? sharedSettings.backgroundColor
+        let linesColor = self.linesColor ?? sharedSettings.linesColor
         
         // heights
-        let titleHeight = self.prefferedLabelHeight(text: self.alertTitle, font: self.titleFont, width: self.containerWidth - 2 * self.contentOffset)
-        let messageHeight = self.prefferedLabelHeight(text: self.message, font: self.messageFont, width: self.containerWidth - 2 * self.contentOffset)
+        let titleHeight = self.prefferedLabelHeight(text: self.alertTitle, font: titleFont, width: self.containerWidth - 2 * self.contentOffset)
+        let messageHeight = self.prefferedLabelHeight(text: self.message, font: messageFont, width: self.containerWidth - 2 * self.contentOffset)
         var textBoxHeight = (titleHeight == 0 ? self.contentOffset : titleHeight + 2 * self.contentOffset) + (messageHeight == 0 ? 0 : messageHeight + self.contentOffset)
         if textBoxHeight < self.containerMinHeight { textBoxHeight = self.containerMinHeight }
         let allHeight = textBoxHeight + (self.actions.count == 2 ? self.actionItemHeight : self.actionItemHeight * CGFloat(self.actions.count))
@@ -210,7 +214,7 @@ class AOAlertController: UIViewController {
         //  white rounded rectangle
         let cFrame = CGRect(x: round((UIScreen.mainScreen().bounds.width - self.containerWidth)/2), y: round((UIScreen.mainScreen().bounds.height - allHeight)/2), width: self.containerWidth, height: allHeight)
         self.container = UIView(frame: cFrame)
-        self.container.backgroundColor = self.backgroundColor
+        self.container.backgroundColor = backColor
         self.container.layer.cornerRadius = 11
         self.container.alpha = 0
         self.container.transform = CGAffineTransformMakeScale(0.5, 0.5)
@@ -220,28 +224,27 @@ class AOAlertController: UIViewController {
         //  text box
         let titleYOffset = messageHeight == 0 ? (textBoxHeight - titleHeight)/2 : (textBoxHeight - titleHeight - messageHeight - self.contentOffset)/2
         let titleFrame = CGRect(x: self.contentOffset, y: titleYOffset, width: self.containerWidth - 2 * self.contentOffset, height: titleHeight)
-        if let titleLabel = self.labelInFrame(titleFrame, text: alertTitle, font: titleFont, textColor: self.titleColor) {
-            
+        if let titleLabel = self.labelInFrame(titleFrame, text: self.alertTitle, font: titleFont, textColor: titleColor) {
             self.container.addSubview(titleLabel)
         }
         
         let messageYOffset = titleHeight == 0 ? (textBoxHeight - messageHeight)/2 : (titleYOffset + titleHeight + self.contentOffset)
         let messageFrame = CGRect(x: self.contentOffset, y: messageYOffset, width: self.containerWidth - 2 * self.contentOffset, height: messageHeight)
-        if let messageLabel = self.labelInFrame(messageFrame, text: message, font: messageFont, textColor: self.messageColor) {
+        if let messageLabel = self.labelInFrame(messageFrame, text: self.message, font: messageFont, textColor: messageColor) {
             self.container.addSubview(messageLabel)
         }
         
         //  line under text box
         if self.actions.count > 0 {
-            let hLine = UIView(frame: CGRect(x: 0, y: textBoxHeight, width: containerWidth, height: 0.5))
-            hLine.backgroundColor = self.linesColor
+            let hLine = UIView(frame: CGRect(x: 0, y: textBoxHeight, width: self.containerWidth, height: 0.5))
+            hLine.backgroundColor = linesColor
             self.container.addSubview(hLine)
         }
         
         //  vertival line
         if self.actions.count == 2 {
             let vLine = UIView(frame: CGRect(x: self.containerWidth/2 - 0.5, y: textBoxHeight, width: 0.5, height: allHeight - textBoxHeight))
-            vLine.backgroundColor = self.linesColor
+            vLine.backgroundColor = linesColor
             self.container.addSubview(vLine)
             
         }
@@ -249,9 +252,9 @@ class AOAlertController: UIViewController {
         //  horizontal lines
         if self.actions.count > 2 {
             for i in 1..<self.actions.count {
-                let lFrame = CGRect(x: 0, y: textBoxHeight + CGFloat(i) * actionItemHeight, width: containerWidth, height: 0.5)
+                let lFrame = CGRect(x: 0, y: textBoxHeight + CGFloat(i) * self.actionItemHeight, width: self.containerWidth, height: 0.5)
                 let line = UIView(frame: lFrame)
-                line.backgroundColor = self.linesColor
+                line.backgroundColor = linesColor
                 self.container.addSubview(line)
             }
         }
@@ -259,17 +262,17 @@ class AOAlertController: UIViewController {
         //  actions
         if self.actions.count == 2 {
             for i in 0..<self.actions.count {
-                let frame = CGRect(x: contentOffset + CGFloat(i) * containerWidth * 0.5, y: textBoxHeight + contentOffset, width: containerWidth * 0.5 - 2 * contentOffset, height: actionItemHeight - 2 * contentOffset)
+                let actionFrame = CGRect(x: self.contentOffset + CGFloat(i) * self.containerWidth * 0.5, y: textBoxHeight + self.contentOffset, width: self.containerWidth * 0.5 - 2 * self.contentOffset, height: self.actionItemHeight - 2 * self.contentOffset)
                 let action = self.actions[i]
-                action.drawOnView(container, frame: frame, font: defaultActionsFont, color: defaultActionItemColor, completion: { [weak self] in
+                action.drawOnView(self.container, frame: actionFrame, completion: { [weak self] in
                     self?.hideAndDismiss()
                 })
             }
         } else {
             for i in 0..<self.actions.count {
-                let frame = CGRect(x: contentOffset, y: textBoxHeight + CGFloat(i) * actionItemHeight + contentOffset, width: containerWidth - 2 * contentOffset, height: actionItemHeight - 2 * contentOffset)
+                let actionFrame = CGRect(x: self.contentOffset, y: textBoxHeight + CGFloat(i) * self.actionItemHeight + self.contentOffset, width: self.containerWidth - 2 * self.contentOffset, height: self.actionItemHeight - 2 * self.contentOffset)
                 let action = self.actions[i]
-                action.drawOnView(container, frame: frame, font: defaultActionsFont, color: defaultActionItemColor, completion: { [weak self] in
+                action.drawOnView(container, frame: actionFrame, completion: { [weak self] in
                     self?.hideAndDismiss()
                 })
             }
@@ -309,6 +312,7 @@ class AOAlertController: UIViewController {
         
         let label:UILabel = UILabel(frame: CGRectMake(0, 0, width, CGFloat.max))
         label.numberOfLines = 0
+        label.textAlignment = .Center
         label.lineBreakMode = NSLineBreakMode.ByWordWrapping
         label.font = f
         label.text = t
@@ -331,6 +335,33 @@ class AOAlertController: UIViewController {
         label.font = f
         label.text = t
         return label
+    }
+    
+    
+    private func sortActions() {
+        if self.actions.count < 2 { return }
+        
+        switch self.style {
+        case .Alert:
+            var cancelIndex: Int?
+            for i in 0..<self.actions.count {
+                if actions[i].style == .Cancel {
+                    cancelIndex = i
+                }
+            }
+            if let index = cancelIndex {
+                let cancelAction = self.actions[index]
+                if self.actions.count == 2 {
+                    self.actions.removeAtIndex(index)
+                    self.actions.insert(cancelAction, atIndex: 0)
+                } else if self.actions.count > 2 {
+                    self.actions.removeAtIndex(index)
+                    self.actions.append(cancelAction)
+                }
+            }
+            
+        case .ActionSheet: break
+        }
     }
     
 }
