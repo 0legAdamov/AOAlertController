@@ -141,6 +141,9 @@ class AOAlertController: UIViewController {
     private let message: String?
     private let containerWidth: CGFloat = 270
     private let contentOffset: CGFloat = 4
+    private let sheetHorizontalOffset: CGFloat = 10
+    private let sheetBottomOffset: CGFloat = 9
+    private let sheetBetweenCancelOffset: CGFloat = 8
     private let containerMinHeight: CGFloat = 60
     private var container = UIView()
     private var actions = [AOAlertAction]()
@@ -204,15 +207,40 @@ class AOAlertController: UIViewController {
         let backColor = self.backgroundColor ?? sharedSettings.backgroundColor
         let linesColor = self.linesColor ?? sharedSettings.linesColor
         
+        let containerWidth = self.style == .ActionSheet ? UIScreen.mainScreen().bounds.width - 2 * self.sheetHorizontalOffset : self.containerWidth
+        
         // heights
-        let titleHeight = self.prefferedLabelHeight(text: self.alertTitle, font: titleFont, width: self.containerWidth - 2 * self.contentOffset)
-        let messageHeight = self.prefferedLabelHeight(text: self.message, font: messageFont, width: self.containerWidth - 2 * self.contentOffset)
+        let titleHeight = self.prefferedLabelHeight(text: self.alertTitle, font: titleFont, width: containerWidth - 2 * self.contentOffset)
+        let messageHeight = self.prefferedLabelHeight(text: self.message, font: messageFont, width: containerWidth - 2 * self.contentOffset)
         var textBoxHeight = (titleHeight == 0 ? self.contentOffset : titleHeight + 2 * self.contentOffset) + (messageHeight == 0 ? 0 : messageHeight + self.contentOffset)
         if textBoxHeight < self.containerMinHeight { textBoxHeight = self.containerMinHeight }
-        let allHeight = textBoxHeight + (self.actions.count == 2 ? self.actionItemHeight : self.actionItemHeight * CGFloat(self.actions.count))
         
+        var sheetCancelActionHeight: CGFloat = 0
+        
+        var allHeight: CGFloat = 0
+        switch self.style {
+        case .ActionSheet:
+            allHeight = textBoxHeight
+            if let lastAction = self.actions.last {
+                if lastAction.style == .Cancel {
+                    allHeight += self.actionItemHeight * CGFloat(self.actions.count - 1)
+                    sheetCancelActionHeight = self.actionItemHeight
+                } else {
+                    allHeight += self.actionItemHeight * CGFloat(self.actions.count)
+                }
+            }
+        case .Alert:
+            allHeight = textBoxHeight + (self.actions.count == 2 ? self.actionItemHeight : self.actionItemHeight * CGFloat(self.actions.count))
+        }
+        var cFrameYPos: CGFloat
+        switch self.style {
+        case .Alert:
+            cFrameYPos = round((UIScreen.mainScreen().bounds.height - allHeight)/2)
+        case .ActionSheet:
+            
+        }
         //  white rounded rectangle
-        let cFrame = CGRect(x: round((UIScreen.mainScreen().bounds.width - self.containerWidth)/2), y: round((UIScreen.mainScreen().bounds.height - allHeight)/2), width: self.containerWidth, height: allHeight)
+        let cFrame = CGRect(x: round((UIScreen.mainScreen().bounds.width - containerWidth)/2), y: round((UIScreen.mainScreen().bounds.height - allHeight)/2), width: self.containerWidth, height: allHeight)
         self.container = UIView(frame: cFrame)
         self.container.backgroundColor = backColor
         self.container.layer.cornerRadius = 11
@@ -277,7 +305,6 @@ class AOAlertController: UIViewController {
                 })
             }
         }
-        
     }
     
     
@@ -345,7 +372,7 @@ class AOAlertController: UIViewController {
         case .Alert:
             var cancelIndex: Int?
             for i in 0..<self.actions.count {
-                if actions[i].style == .Cancel {
+                if self.actions[i].style == .Cancel {
                     cancelIndex = i
                 }
             }
@@ -360,7 +387,18 @@ class AOAlertController: UIViewController {
                 }
             }
             
-        case .ActionSheet: break
+        case .ActionSheet:
+            var cancelIndex: Int?
+            for i in 0..<self.actions.count {
+                if self.actions[i].style == .Cancel {
+                    cancelIndex = i
+                }
+            }
+            if let index = cancelIndex {
+                let cancelAction = self.actions[index]
+                self.actions.removeAtIndex(index)
+                self.actions.append(cancelAction)
+            }
         }
     }
     

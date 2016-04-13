@@ -14,6 +14,8 @@ class ViewController: UITableViewController {
         super.viewDidLoad()
         
         self.title = "Examples"
+        
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Add, target: self, action: "test")
     }
 
     override func didReceiveMemoryWarning() {
@@ -26,14 +28,17 @@ class ViewController: UITableViewController {
         switch indexPath.section {
         case 0:
             switch indexPath.row {
-            case 0: self.showWithoutActions()
-            case 1: self.showOneAction()
-            case 2: self.showTwoActions()
-            case 3: self.showThreeActions()
+            case 0: self.alertWithoutActions()
+            case 1: self.alertOneAction()
+            case 2: self.alertTwoActions()
+            case 3: self.alertThreeActions()
             default: break
             }
         case 1:
-            test()
+            switch indexPath.row {
+            case 0: self.sheetWithoutActions()
+            default: break
+            }
         default: break
         }
         
@@ -42,7 +47,7 @@ class ViewController: UITableViewController {
     
     
     func test() {
-        let alert = UIAlertController(title: "No actions", message: "Tap around the alert", preferredStyle: UIAlertControllerStyle.Alert)
+        let alert = UIAlertController(title: "No actions", message: "Tap around the alert", preferredStyle: UIAlertControllerStyle.ActionSheet)
 //        let action1 = UIAlertAction(title: "Action 1", style: UIAlertActionStyle.Default, handler: nil)
         let action2 = UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel, handler: nil)
         let action3 = UIAlertAction(title: "Action 2", style: UIAlertActionStyle.Destructive, handler: nil)
@@ -54,36 +59,55 @@ class ViewController: UITableViewController {
     
     // MARK: - alert style
     
-    func showWithoutActions() {
+    func alertWithoutActions() {
         let alert = AOAlertController(title: "No actions", message: "Tap around the alert", style: .Alert)
         self.navigationController?.presentViewController(alert, animated: false, completion: nil)
     }
     
-    func showOneAction() {
+    func alertOneAction() {
         let alert = AOAlertController(title: "One action", message: "One .Default action", style: .Alert)
+        alert.titleColor = UIColor.redColor()
+        alert.titleFont = UIFont(name: "AvenirNext-Bold", size: 14)!
         let action = AOAlertAction(title: "Done", style: .Default, handler: nil)
         alert.addAction(action)
         self.navigationController?.presentViewController(alert, animated: false, completion: nil)
     }
     
-    func showTwoActions() {
-        let alert = AOAlertController(title: "Two actions", message: ".Default and .Destructive action", style: .Alert)
-        let actionDef   = AOAlertAction(title: "Done", style: .Default, handler: nil)
-        let actionDestr = AOAlertAction(title: "Remove", style: .Destructive, handler: nil)
+    func alertTwoActions() {
+        let alert = AOAlertController(title: "Two actions", message: nil, style: .Alert)
+        let actionDef   = AOAlertAction(title: "Default", style: .Default, handler: nil)
+        let actionCancel = AOAlertAction(title: "Cancel", style: .Cancel, handler: nil)
+        actionCancel.color = UIColor.orangeColor()
         alert.addAction(actionDef)
-        alert.addAction(actionDestr)
+        alert.addAction(actionCancel)
         self.navigationController?.presentViewController(alert, animated: false, completion: nil)
     }
     
     
-    func showThreeActions() {
-        let alert = AOAlertController(title: "Three actions", message: "With .Default and\n.Cancel actions", style: .Alert)
-        let action1 = AOAlertAction(title: "Action 1", style: .Default, handler: nil)
-        let action2 = AOAlertAction(title: "Action 2", style: .Default, handler: nil)
+    func alertThreeActions() {
+        let alert = AOAlertController(title: "Three actions", message: "With .Destructive and\n.Cancel actions", style: .Alert)
+        alert.backgroundColor = UIColor(red: 0.28, green: 0.28, blue: 0.28, alpha: 1)
+        alert.titleColor = UIColor.whiteColor()
+        alert.messageColor = UIColor.lightGrayColor()
+        alert.linesColor = UIColor.darkGrayColor()
+        let action1 = AOAlertAction(title: "Remove", style: .Destructive, handler: nil)
+        action1.color = UIColor.whiteColor()
+        let action2 = AOAlertAction(title: "Remove all", style: .Destructive, handler: nil)
+        action2.color = UIColor.whiteColor()
         let cancelAction = AOAlertAction(title: "Cancel", style: .Cancel, handler: nil)
+        cancelAction.color = UIColor.whiteColor()
         alert.addAction(cancelAction)
         alert.addAction(action1)
         alert.addAction(action2)
+        self.navigationController?.presentViewController(alert, animated: false, completion: nil)
+    }
+    
+    
+    // MARK: - actionsheet stye
+    
+    
+    func sheetWithoutActions() {
+        let alert = AOAlertController(title: "Title", message: "message", style: .ActionSheet)
         self.navigationController?.presentViewController(alert, animated: false, completion: nil)
     }
     
