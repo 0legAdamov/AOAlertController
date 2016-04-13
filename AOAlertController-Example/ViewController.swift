@@ -15,7 +15,8 @@ class ViewController: UITableViewController {
         
         self.title = "Examples"
         
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Add, target: self, action: "test")
+//        self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Add, target: self, action: "test")
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Add, target: self, action: #selector(ViewController.test))
     }
 
     override func didReceiveMemoryWarning() {
@@ -108,6 +109,10 @@ class ViewController: UITableViewController {
     
     func sheetWithoutActions() {
         let alert = AOAlertController(title: "Title", message: "message", style: .ActionSheet)
+        let action1 = AOAlertAction(title: "Action 1", style: .Default, handler: nil)
+        let cancel = AOAlertAction(title: "Cancel", style: .Cancel, handler: nil)
+        alert.addAction(action1)
+        alert.addAction(cancel)
         self.navigationController?.presentViewController(alert, animated: false, completion: nil)
     }
     

@@ -26,6 +26,8 @@ class AOAlertSettings {
     var defaultActionColor     = UIColor(red: 0, green: 0.48, blue: 1, alpha: 1)
     var destructiveActionColor = UIColor(red: 1, green: 0.23, blue: 0.19, alpha: 1)
     var cancelActionColor      = UIColor(red: 0, green: 0.48, blue: 1, alpha: 1)
+    
+    var tapBackgroundToDismiss = false
 }
 
 
@@ -62,8 +64,8 @@ class AOAlertAction {
         button.titleLabel?.font = textFont
         button.setTitleColor(textColor, forState: .Normal)
         button.setTitle(self.title, forState: .Normal)
-//        button.addTarget(self, action: #selector(AOAlertAction.buttonPressed), forControlEvents: .TouchUpInside)
-        button.addTarget(self, action: "buttonPressed", forControlEvents: .TouchUpInside)
+        button.addTarget(self, action: #selector(AOAlertAction.buttonPressed), forControlEvents: .TouchUpInside)
+//        button.addTarget(self, action: "buttonPressed", forControlEvents: .TouchUpInside)
         self.completion = completion
         parentView.addSubview(button)
     }
@@ -118,7 +120,8 @@ class AOAlertController: UIViewController {
             if messageFont == nil { print("Error: message font is nil!") }
         }
     }
-
+    var tapBackgroundToDismiss: Bool?
+    
     
     init(title: String?, message: String?, style: AOAlertControllerStyle) {
         self.alertTitle = title
@@ -143,9 +146,11 @@ class AOAlertController: UIViewController {
     private let contentOffset: CGFloat = 4
     private let sheetHorizontalOffset: CGFloat = 10
     private let sheetBottomOffset: CGFloat = 9
+    private var sheetYOffset: CGFloat = 0
     private let sheetBetweenCancelOffset: CGFloat = 8
     private let containerMinHeight: CGFloat = 60
     private var container = UIView()
+    private var cancelContainer: UIView?
     private var actions = [AOAlertAction]()
     
     
@@ -170,9 +175,10 @@ class AOAlertController: UIViewController {
             self.alertTitle = " "
         }
         
-        if self.actions.count == 0 {
-//            let tapGest = UITapGestureRecognizer(target: self, action: #selector(AOAlertController.didTapBackground(_:)))
-            let tapGest = UITapGestureRecognizer(target: self, action: "didTapBackground:")
+        let tapBackToDismiss = self.tapBackgroundToDismiss ?? AOAlertSettings.sharedSettings.tapBackgroundToDismiss
+        if self.actions.count == 0 || tapBackToDismiss {
+            let tapGest = UITapGestureRecognizer(target: self, action: #selector(AOAlertController.didTapBackground(_:)))
+//            let tapGest = UITapGestureRecognizer(target: self, action: "didTapBackground:")
             self.view.addGestureRecognizer(tapGest)
         }
         
@@ -232,75 +238,150 @@ class AOAlertController: UIViewController {
         case .Alert:
             allHeight = textBoxHeight + (self.actions.count == 2 ? self.actionItemHeight : self.actionItemHeight * CGFloat(self.actions.count))
         }
-        var cFrameYPos: CGFloat
+        
         switch self.style {
         case .Alert:
-            cFrameYPos = round((UIScreen.mainScreen().bounds.height - allHeight)/2)
+            self.sheetYOffset = round((UIScreen.mainScreen().bounds.height - allHeight)/2)
         case .ActionSheet:
-            
+            self.sheetYOffset = UIScreen.mainScreen().bounds.height - (sheetCancelActionHeight == 0 ? self.sheetBottomOffset : self.sheetBottomOffset + self.sheetBetweenCancelOffset + sheetCancelActionHeight) - allHeight
         }
+        
         //  white rounded rectangle
-        let cFrame = CGRect(x: round((UIScreen.mainScreen().bounds.width - containerWidth)/2), y: round((UIScreen.mainScreen().bounds.height - allHeight)/2), width: self.containerWidth, height: allHeight)
+        let cFrame = CGRect(x: round((UIScreen.mainScreen().bounds.width - containerWidth)/2), y: self.sheetYOffset, width: containerWidth, height: allHeight)
         self.container = UIView(frame: cFrame)
         self.container.backgroundColor = backColor
         self.container.layer.cornerRadius = 11
         self.container.alpha = 0
-        self.container.transform = CGAffineTransformMakeScale(0.5, 0.5)
+        switch self.style {
+        case .Alert:
+            self.container.transform = CGAffineTransformMakeScale(0.5, 0.5)
+        case .ActionSheet:
+            var fr = cFrame
+            fr.origin.y = UIScreen.mainScreen().bounds.height
+            self.container.frame = fr
+        }
         self.container.clipsToBounds = true
         self.view.addSubview(self.container)
         
+        // cancel rounded rectangle
+        if (self.style == .ActionSheet) && (sheetCancelActionHeight != 0) {
+            let cancelFr = CGRect(x: cFrame.origin.x, y: UIScreen.mainScreen().bounds.height + self.sheetBottomOffset + cFrame.height, width: cFrame.width, height: sheetCancelActionHeight)
+            let cancelCont = UIView(frame: cancelFr)
+            cancelCont.backgroundColor = backColor
+            cancelCont.layer.cornerRadius = 11
+            cancelCont.alpha = 0
+            cancelCont.clipsToBounds = true
+            self.view.addSubview(cancelCont)
+            self.cancelContainer = cancelCont
+        }
+        
         //  text box
         let titleYOffset = messageHeight == 0 ? (textBoxHeight - titleHeight)/2 : (textBoxHeight - titleHeight - messageHeight - self.contentOffset)/2
-        let titleFrame = CGRect(x: self.contentOffset, y: titleYOffset, width: self.containerWidth - 2 * self.contentOffset, height: titleHeight)
+        let titleFrame = CGRect(x: self.contentOffset, y: titleYOffset, width: containerWidth - 2 * self.contentOffset, height: titleHeight)
         if let titleLabel = self.labelInFrame(titleFrame, text: self.alertTitle, font: titleFont, textColor: titleColor) {
             self.container.addSubview(titleLabel)
         }
         
         let messageYOffset = titleHeight == 0 ? (textBoxHeight - messageHeight)/2 : (titleYOffset + titleHeight + self.contentOffset)
-        let messageFrame = CGRect(x: self.contentOffset, y: messageYOffset, width: self.containerWidth - 2 * self.contentOffset, height: messageHeight)
+        let messageFrame = CGRect(x: self.contentOffset, y: messageYOffset, width: containerWidth - 2 * self.contentOffset, height: messageHeight)
         if let messageLabel = self.labelInFrame(messageFrame, text: self.message, font: messageFont, textColor: messageColor) {
             self.container.addSubview(messageLabel)
         }
         
         //  line under text box
         if self.actions.count > 0 {
-            let hLine = UIView(frame: CGRect(x: 0, y: textBoxHeight, width: self.containerWidth, height: 0.5))
-            hLine.backgroundColor = linesColor
-            self.container.addSubview(hLine)
+            switch self.style {
+            case .Alert:
+                let hLine = UIView(frame: CGRect(x: 0, y: textBoxHeight, width: containerWidth, height: 0.5))
+                hLine.backgroundColor = linesColor
+                self.container.addSubview(hLine)
+            case .ActionSheet:
+                if self.actions.count == 1 {
+                    if self.actions[0].style == .Cancel { break }
+                }
+                let hLine = UIView(frame: CGRect(x: 0, y: textBoxHeight, width: containerWidth, height: 0.5))
+                hLine.backgroundColor = linesColor
+                self.container.addSubview(hLine)
+            }
         }
         
-        //  vertival line
-        if self.actions.count == 2 {
-            let vLine = UIView(frame: CGRect(x: self.containerWidth/2 - 0.5, y: textBoxHeight, width: 0.5, height: allHeight - textBoxHeight))
-            vLine.backgroundColor = linesColor
-            self.container.addSubview(vLine)
-            
-        }
-        
-        //  horizontal lines
-        if self.actions.count > 2 {
-            for i in 1..<self.actions.count {
-                let lFrame = CGRect(x: 0, y: textBoxHeight + CGFloat(i) * self.actionItemHeight, width: self.containerWidth, height: 0.5)
-                let line = UIView(frame: lFrame)
-                line.backgroundColor = linesColor
-                self.container.addSubview(line)
+        //  actions lines
+        switch self.style {
+        case .Alert:
+            //  vertival line
+            if self.style == .Alert {
+                if self.actions.count == 2 {
+                    let vLine = UIView(frame: CGRect(x: containerWidth/2 - 0.5, y: textBoxHeight, width: 0.5, height: allHeight - textBoxHeight))
+                    vLine.backgroundColor = linesColor
+                    self.container.addSubview(vLine)
+                    
+                }
+            }
+            //  horizontal lines
+            if self.actions.count > 2 {
+                for i in 1..<self.actions.count {
+                    let lFrame = CGRect(x: 0, y: textBoxHeight + CGFloat(i) * self.actionItemHeight, width: containerWidth, height: 0.5)
+                    let line = UIView(frame: lFrame)
+                    line.backgroundColor = linesColor
+                    self.container.addSubview(line)
+                }
+            }
+        case .ActionSheet:
+            let count = self.actions.count - (sheetCancelActionHeight == 0 ? 0 : 1)
+            if count > 1 {
+                for i in 1..<count {
+                    let lFrame = CGRect(x: 0, y: textBoxHeight + CGFloat(i) * self.actionItemHeight, width: containerWidth, height: 0.5)
+                    let line = UIView(frame: lFrame)
+                    line.backgroundColor = linesColor
+                    self.container.addSubview(line)
+                }
             }
         }
         
         //  actions
-        if self.actions.count == 2 {
-            for i in 0..<self.actions.count {
-                let actionFrame = CGRect(x: self.contentOffset + CGFloat(i) * self.containerWidth * 0.5, y: textBoxHeight + self.contentOffset, width: self.containerWidth * 0.5 - 2 * self.contentOffset, height: self.actionItemHeight - 2 * self.contentOffset)
-                let action = self.actions[i]
-                action.drawOnView(self.container, frame: actionFrame, completion: { [weak self] in
-                    self?.hideAndDismiss()
-                })
+        switch self.style {
+            
+        case .Alert:
+            if self.actions.count == 2 {
+                for i in 0..<self.actions.count {
+                    let actionFrame = CGRect(x: self.contentOffset + CGFloat(i) * containerWidth * 0.5, y: textBoxHeight + self.contentOffset, width: containerWidth * 0.5 - 2 * self.contentOffset, height: self.actionItemHeight - 2 * self.contentOffset)
+                    let action = self.actions[i]
+                    action.drawOnView(self.container, frame: actionFrame, completion: { [weak self] in
+                        self?.hideAndDismiss()
+                        })
+                }
+            } else {
+                for i in 0..<self.actions.count {
+                    let actionFrame = CGRect(x: self.contentOffset, y: textBoxHeight + CGFloat(i) * self.actionItemHeight + self.contentOffset, width: containerWidth - 2 * self.contentOffset, height: self.actionItemHeight - 2 * self.contentOffset)
+                    let action = self.actions[i]
+                    action.drawOnView(self.container, frame: actionFrame, completion: { [weak self] in
+                        self?.hideAndDismiss()
+                        })
+                }
             }
-        } else {
-            for i in 0..<self.actions.count {
-                let actionFrame = CGRect(x: self.contentOffset, y: textBoxHeight + CGFloat(i) * self.actionItemHeight + self.contentOffset, width: self.containerWidth - 2 * self.contentOffset, height: self.actionItemHeight - 2 * self.contentOffset)
-                let action = self.actions[i]
-                action.drawOnView(container, frame: actionFrame, completion: { [weak self] in
+            
+        case .ActionSheet:
+            if sheetCancelActionHeight == 0 {
+                for i in 0..<self.actions.count {
+                    let actionFrame = CGRect(x: self.contentOffset, y: textBoxHeight + CGFloat(i) * self.actionItemHeight + self.contentOffset, width: containerWidth - 2 * self.contentOffset, height: self.actionItemHeight - 2 * self.contentOffset)
+                    let action = self.actions[i]
+                    action.drawOnView(self.container, frame: actionFrame, completion: { [weak self] in
+                        self?.hideAndDismiss()
+                    })
+                }
+            } else {
+                let count = self.actions.count - 1
+                for i in 0..<count {
+                    let actionFrame = CGRect(x: self.contentOffset, y: textBoxHeight + CGFloat(i) * self.actionItemHeight + self.contentOffset, width: containerWidth - 2 * self.contentOffset, height: self.actionItemHeight - 2 * self.contentOffset)
+                    let action = self.actions[i]
+                    action.drawOnView(self.container, frame: actionFrame, completion: { [weak self] in
+                        self?.hideAndDismiss()
+                        })
+                }
+                guard let cancelAction = self.actions.last else { break }
+                guard let cancelContainer = self.cancelContainer else { break }
+                let cancelFrame = CGRect(x: self.contentOffset, y: self.contentOffset, width: containerWidth - 2 * self.contentOffset, height: self.actionItemHeight - 2 * self.contentOffset)
+                cancelAction.drawOnView(cancelContainer, frame: cancelFrame, completion: { [weak self] in
                     self?.hideAndDismiss()
                 })
             }
@@ -309,20 +390,44 @@ class AOAlertController: UIViewController {
     
     
     private func showUp() {
+        var containerFr = self.container.frame
+        containerFr.origin.y = self.sheetYOffset
+        var cancelFr = self.cancelContainer?.frame
+        cancelFr?.origin.y = self.sheetYOffset + containerFr.height + self.sheetBetweenCancelOffset
+        
         UIView.animateWithDuration(0.2, delay: 0, options: .CurveEaseInOut, animations: { [weak self] in
             self?.view.alpha = 1
             }, completion: nil)
         UIView.animateWithDuration(0.4, delay: 0.2, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.2, options: .CurveEaseInOut, animations: {
             self.container.alpha = 1
-            self.container.transform = CGAffineTransformIdentity
+            switch self.style {
+            case .Alert:
+                self.container.transform = CGAffineTransformIdentity
+            case .ActionSheet:
+                self.cancelContainer?.alpha = 1
+                self.container.frame = containerFr
+                if let cancelFrame = cancelFr { self.cancelContainer?.frame = cancelFrame }
+            }
             }, completion: nil)
     }
     
     
     private func hideAndDismiss() {
+        var containerFr = self.container.frame
+        containerFr.origin.y = UIScreen.mainScreen().bounds.height
+        var cancelFr = self.cancelContainer?.frame
+        cancelFr?.origin.y = containerFr.origin.y + containerFr.height + self.sheetBetweenCancelOffset
+        
         UIView.animateWithDuration(0.3, delay: 0, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.2, options: .CurveEaseInOut, animations: {
             self.container.alpha = 0
-            self.container.transform = CGAffineTransformMakeScale(0.5, 0.5)
+            switch self.style {
+            case .Alert:
+                self.container.transform = CGAffineTransformMakeScale(0.5, 0.5)
+            case .ActionSheet:
+                self.cancelContainer?.alpha = 0
+                self.container.frame = containerFr
+                if let cancelFrame = cancelFr { self.cancelContainer?.frame = cancelFrame }
+            }
             }, completion: nil)
         UIView.animateWithDuration(0.2, delay: 0.2, options: .CurveEaseInOut, animations: {
             self.view.alpha = 0
