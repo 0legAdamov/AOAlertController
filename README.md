@@ -45,6 +45,18 @@ Properties set to individual controllers have a higher priority than properties 
 **Controller styles**
 - `AOAlertControllerStyle.Alert`
 - `AOAlertControllerStyle.ActionSheet`
+
+**Available controller's properties**
+- `actionItemHeight`
+- `backgroundColor`
+- `linesColor`
+- `titleColor`
+- `titleFont`
+- `messageColor`
+- `messageFont`
+- `tapBackgroundToDismiss`
+
+Example:
 ```Swift
 let alert = AOAlertController(title: "Title", message: nil, style: .Alert)
 alert.titleFont = UIFont(name: "AvenirNext-Bold", size: 14)!
@@ -54,8 +66,25 @@ alert.titleFont = UIFont(name: "AvenirNext-Bold", size: 14)!
 - `AOAlertActionStyle.Default`
 - `AOAlertActionStyle.Cancel`
 - `AOAlertActionStyle.Destructive`
+
+**Available properties**
+- `color`
+- `font`
+
+Example:
 ```Swift
 let actionCancel = AOAlertAction(title: "Cancel", style: .Cancel, handler: nil)
 actionCancel.color = UIColor.orangeColor()
 alert.addAction(actionCancel)
+```
+
+Full usage Example:
+```Swift
+let alert = AOAlertController(title: "Example Alert", message: "All in one", style: .Alert)
+let action = AOAlertAction(title: "Default Action", style: .Default) {}
+action.color = UIColor.blackColor()
+let cancel = AOAlertAction(title: "Cancel", style: .Cancel, handler: nil)
+alert.addAction(action)
+alert.addAction(cancel)
+self.navigationController?.presentViewController(alert, animated: false, completion: nil)
 ```
