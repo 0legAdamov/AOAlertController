@@ -6,10 +6,18 @@
 [![CocoaPods available](http://img.shields.io/badge/available-iOS%208.2-orange.svg)]
 (https://developer.apple.com/swift)
 
-Custom UIAlertController (In progress)
+`AOAlertController` looks like a usual `UIAlertController`, but each action item, titles, fonts and colors can be customized.
 
 ![Screenshot](demo.gif)
 
 ## Installation
 CocoaPods: 
-Add
+`pod 'AOAlertController'`
+
+##Description
+
+There are two ways to setup Alert:
+
+#### Setup 
+
+## Usage
