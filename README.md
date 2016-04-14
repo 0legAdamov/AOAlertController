@@ -43,8 +43,19 @@ Properties set to individual controllers have a higher priority than properties 
 
 #### Configuration
 **Controller styles**
-- AOAlertControllerStyle**.Alert**
-- AOAlertControllerStyle**.ActionSheet**
+- `AOAlertControllerStyle.Alert`
+- `AOAlertControllerStyle.ActionSheet`
 ```Swift
 let alert = AOAlertController(title: "Title", message: nil, style: .Alert)
+alert.titleFont = UIFont(name: "AvenirNext-Bold", size: 14)!
+```
+
+**Action styles**
+- `AOAlertActionStyle.Default`
+- `AOAlertActionStyle.Cancel`
+- `AOAlertActionStyle.Destructive`
+```Swift
+let actionCancel = AOAlertAction(title: "Cancel", style: .Cancel, handler: nil)
+actionCancel.color = UIColor.orangeColor()
+alert.addAction(actionCancel)
 ```
