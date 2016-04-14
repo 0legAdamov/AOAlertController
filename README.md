@@ -14,9 +14,27 @@
 CocoaPods: 
 `pod 'AOAlertController'`
 
-#### There are two ways to set up Alerts:
+## Usage
 
+#### There are two ways to set up Alerts:
 - Configure `AOAlertSettings` class as default style for all alert controllers
 - Set up each controller you want to create 
 
-## Usage
+#### AOAlertSettings properties:
+- titleFont
+- messageFont
+- defaultActionFont
+- cancelActionFont
+- destructiveActionFont
+- backgroundColor
+- linesColor
+- titleColor
+- messageColor
+- defaultActionColor
+- destructiveActionColor
+- cancelActionColor
+- tapBackgroundToDismiss
+
+Example:
+`AOAlertSettings.sharedSettings.backgroundColor = UIColor.redColor()`
+
