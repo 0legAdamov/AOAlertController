@@ -11,8 +11,8 @@
 ![Screenshot](demo.gif)
 
 ## Installation
-CocoaPods: 
-`pod 'AOAlertController'`
+- CocoaPods: `pod 'AOAlertController'`
+- From Source folder
 
 ## Usage
 
