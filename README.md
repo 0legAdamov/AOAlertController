@@ -21,22 +21,30 @@ CocoaPods:
 - Set up each controller you want to create 
 
 #### AOAlertSettings properties:
-- titleFont
-- messageFont
-- defaultActionFont
-- cancelActionFont
-- destructiveActionFont
-- backgroundColor
-- linesColor
-- titleColor
-- messageColor
-- defaultActionColor
-- destructiveActionColor
-- cancelActionColor
-- tapBackgroundToDismiss
+- `titleFont`
+- `messageFont`
+- `defaultActionFont`
+- `cancelActionFont`
+- `destructiveActionFont`
+- `backgroundColor`
+- `linesColor`
+- `titleColor`
+- `messageColor`
+- `defaultActionColor`
+- `destructiveActionColor`
+- `cancelActionColor`
+- `tapBackgroundToDismiss`
 
 Example:
-`AOAlertSettings.sharedSettings.backgroundColor = UIColor.redColor()` - this means that for all instances of the controller red background will be set as default.
+`AOAlertSettings.sharedSettings.backgroundColor = UIColor.redColor()` - this means that for all instances of the `AOAlertController` red background will be set as default.
 
 #### Changing the properties of a single controller:
-Properties set to individual controllers have a higher priority than `AOAlertSettings`
+Properties set to individual controllers have a higher priority than properties from `AOAlertSettings`
+
+#### Configuration
+**Controller styles**
+- AOAlertControllerStyle**.Alert**
+- AOAlertControllerStyle**.ActionSheet**
+```Swift
+let alert = AOAlertController(title: "Title", message: nil, style: .Alert)
+```
