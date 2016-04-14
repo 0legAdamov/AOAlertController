@@ -15,8 +15,8 @@ class ViewController: UITableViewController {
         
         self.title = "Examples"
         
-//        self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Add, target: self, action: "test")
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Add, target: self, action: #selector(ViewController.test))
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Add, target: self, action: "test")
+//        self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Add, target: self, action: #selector(ViewController.test))
     }
 
     override func didReceiveMemoryWarning() {
@@ -37,7 +37,9 @@ class ViewController: UITableViewController {
             }
         case 1:
             switch indexPath.row {
-            case 0: self.sheetWithoutActions()
+            case 0: self.sheetOneAction()
+            case 1: self.sheetTwoActions()
+            case 2: self.sheetThreeActions()
             default: break
             }
         default: break
@@ -107,14 +109,41 @@ class ViewController: UITableViewController {
     // MARK: - actionsheet stye
     
     
-    func sheetWithoutActions() {
-        let alert = AOAlertController(title: "Title", message: "message", style: .ActionSheet)
-        let action1 = AOAlertAction(title: "Action 1", style: .Default, handler: nil)
+    func sheetOneAction() {
+        let alert = AOAlertController(title: "One action", message: "default appearance", style: .ActionSheet)
         let cancel = AOAlertAction(title: "Cancel", style: .Cancel, handler: nil)
-        alert.addAction(action1)
         alert.addAction(cancel)
         self.navigationController?.presentViewController(alert, animated: false, completion: nil)
     }
     
+    
+    func sheetTwoActions() {
+        let alert = AOAlertController(title: "Two actions", message: "custom actions color", style: .ActionSheet)
+        let action1 = AOAlertAction(title: "Action 1", style: .Default, handler: nil)
+        action1.color = UIColor.orangeColor()
+        let action2 = AOAlertAction(title: "Action 2", style: .Default, handler: nil)
+        action2.color = UIColor.darkGrayColor()
+        alert.addAction(action1)
+        alert.addAction(action2)
+        self.navigationController?.presentViewController(alert, animated: false, completion: nil)
+    }
+    
+    
+    func sheetThreeActions() {
+        let alert = AOAlertController(title: "Three actions", message: nil, style: .ActionSheet)
+        alert.backgroundColor = UIColor(red: 0.28, green: 0.28, blue: 0.28, alpha: 1)
+        alert.linesColor = UIColor.darkGrayColor()
+        alert.titleColor = UIColor.whiteColor()
+        let defaultAction = AOAlertAction(title: "Default action", style: .Default, handler: nil)
+        defaultAction.color = UIColor.lightGrayColor()
+        let cancelAction = AOAlertAction(title: "Cancel", style: .Cancel, handler: nil)
+        cancelAction.color = UIColor.yellowColor()
+        let destrAction = AOAlertAction(title: "Destructive", style: .Destructive, handler: nil)
+        destrAction.color = UIColor.orangeColor()
+        alert.addAction(defaultAction)
+        alert.addAction(cancelAction)
+        alert.addAction(destrAction)
+        self.navigationController?.presentViewController(alert, animated: false, completion: nil)
+    }
 }
 
