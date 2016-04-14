@@ -14,9 +14,6 @@ class ViewController: UITableViewController {
         super.viewDidLoad()
         
         self.title = "Examples"
-        
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Add, target: self, action: "test")
-//        self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Add, target: self, action: #selector(ViewController.test))
     }
 
     override func didReceiveMemoryWarning() {
@@ -46,18 +43,6 @@ class ViewController: UITableViewController {
         }
         
         self.tableView.deselectRowAtIndexPath(indexPath, animated: true)
-    }
-    
-    
-    func test() {
-        let alert = UIAlertController(title: "No actions", message: "Tap around the alert", preferredStyle: UIAlertControllerStyle.ActionSheet)
-//        let action1 = UIAlertAction(title: "Action 1", style: UIAlertActionStyle.Default, handler: nil)
-        let action2 = UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel, handler: nil)
-        let action3 = UIAlertAction(title: "Action 2", style: UIAlertActionStyle.Destructive, handler: nil)
-//        alert.addAction(action1)
-        alert.addAction(action3)
-        alert.addAction(action2)
-        self.navigationController?.presentViewController(alert, animated: false, completion: nil)
     }
     
     // MARK: - alert style
