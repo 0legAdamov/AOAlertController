@@ -9,3 +9,7 @@
 Custom UIAlertController (In progress)
 
 ![Screenshot](demo.gif)
+
+## Installation
+CocoaPods: 
+Add
