@@ -14,10 +14,9 @@
 CocoaPods: 
 `pod 'AOAlertController'`
 
-##Description
+#### There are two ways to set up Alerts:
 
-There are two ways to setup Alert:
-
-#### Setup 
+- Configure `AOAlertSettings` class as default style for all alert controllers
+- Set up each controller you want to create 
 
 ## Usage
