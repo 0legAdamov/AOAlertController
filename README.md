@@ -36,5 +36,6 @@ CocoaPods:
 - tapBackgroundToDismiss
 
 Example:
-`AOAlertSettings.sharedSettings.backgroundColor = UIColor.redColor()`
+`AOAlertSettings.sharedSettings.backgroundColor = UIColor.redColor()` - this means that for all instances of the controller red background will be set as default.
 
+#### Changing the properties of a single controller
