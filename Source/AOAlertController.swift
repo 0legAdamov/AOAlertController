@@ -64,8 +64,8 @@ class AOAlertAction {
         button.titleLabel?.font = textFont
         button.setTitleColor(textColor, forState: .Normal)
         button.setTitle(self.title, forState: .Normal)
-//        button.addTarget(self, action: #selector(AOAlertAction.buttonPressed), forControlEvents: .TouchUpInside)
-        button.addTarget(self, action: "buttonPressed", forControlEvents: .TouchUpInside)
+        button.addTarget(self, action: #selector(AOAlertAction.buttonPressed), forControlEvents: .TouchUpInside)
+//        button.addTarget(self, action: "buttonPressed", forControlEvents: .TouchUpInside)
         self.completion = completion
         parentView.addSubview(button)
     }
@@ -177,8 +177,8 @@ class AOAlertController: UIViewController {
         
         let tapBackToDismiss = self.tapBackgroundToDismiss ?? AOAlertSettings.sharedSettings.tapBackgroundToDismiss
         if self.actions.count == 0 || tapBackToDismiss {
-//            let tapGest = UITapGestureRecognizer(target: self, action: #selector(AOAlertController.didTapBackground(_:)))
-            let tapGest = UITapGestureRecognizer(target: self, action: "didTapBackground:")
+            let tapGest = UITapGestureRecognizer(target: self, action: #selector(AOAlertController.didTapBackground(_:)))
+//            let tapGest = UITapGestureRecognizer(target: self, action: "didTapBackground:")
             self.view.addGestureRecognizer(tapGest)
         }
         
