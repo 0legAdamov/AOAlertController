@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
   spec.name         = 'AOAlertController'
-  spec.version      = '1.0'
+  spec.version      = '1.1'
   spec.summary      = 'AOAlertController looks like a usual UIAlertController, but each action item, titles, fonts and colors can be customized.'
   spec.homepage     = 'https://github.com/0legAdamov/AOAlertController'
   spec.author       = { 'Oleg Adamov' => 'adamov.mailbox@yandex.ru' }

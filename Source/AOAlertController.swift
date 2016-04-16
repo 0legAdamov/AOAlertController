@@ -9,40 +9,40 @@
 import UIKit
 
 
-class AOAlertSettings {
+public class AOAlertSettings {
     
-    static let sharedSettings = AOAlertSettings()
+    public static let sharedSettings = AOAlertSettings()
     
-    var titleFont              = UIFont.systemFontOfSize(16, weight: UIFontWeightMedium)
-    var messageFont            = UIFont.systemFontOfSize(13)
-    var defaultActionFont      = UIFont.systemFontOfSize(16)
-    var cancelActionFont       = UIFont.systemFontOfSize(16, weight: UIFontWeightMedium)
-    var destructiveActionFont  = UIFont.systemFontOfSize(16)
+    public var titleFont              = UIFont.systemFontOfSize(16, weight: UIFontWeightMedium)
+    public var messageFont            = UIFont.systemFontOfSize(13)
+    public var defaultActionFont      = UIFont.systemFontOfSize(16)
+    public var cancelActionFont       = UIFont.systemFontOfSize(16, weight: UIFontWeightMedium)
+    public var destructiveActionFont  = UIFont.systemFontOfSize(16)
     
-    var backgroundColor        = UIColor(red: 0.98, green: 0.98, blue: 0.98, alpha: 1)
-    var linesColor             = UIColor(red: 0.8, green: 0.8, blue: 0.81, alpha: 1)
-    var titleColor             = UIColor.blackColor()
-    var messageColor           = UIColor.blackColor()
-    var defaultActionColor     = UIColor(red: 0, green: 0.48, blue: 1, alpha: 1)
-    var destructiveActionColor = UIColor(red: 1, green: 0.23, blue: 0.19, alpha: 1)
-    var cancelActionColor      = UIColor(red: 0, green: 0.48, blue: 1, alpha: 1)
+    public var backgroundColor        = UIColor(red: 0.98, green: 0.98, blue: 0.98, alpha: 1)
+    public var linesColor             = UIColor(red: 0.8, green: 0.8, blue: 0.81, alpha: 1)
+    public var titleColor             = UIColor.blackColor()
+    public var messageColor           = UIColor.blackColor()
+    public var defaultActionColor     = UIColor(red: 0, green: 0.48, blue: 1, alpha: 1)
+    public var destructiveActionColor = UIColor(red: 1, green: 0.23, blue: 0.19, alpha: 1)
+    public var cancelActionColor      = UIColor(red: 0, green: 0.48, blue: 1, alpha: 1)
     
-    var tapBackgroundToDismiss = false
+    public var tapBackgroundToDismiss = false
 }
 
 
 
-enum AOAlertActionStyle {
+public enum AOAlertActionStyle {
     case Default, Destructive, Cancel
 }
 
 
-class AOAlertAction {
+public class AOAlertAction {
     
-    var color: UIColor?
-    var font: UIFont?
+    public var color: UIColor?
+    public var font: UIFont?
     
-    init(title: String, style: AOAlertActionStyle, handler: (() -> Void)?) {
+    public init(title: String, style: AOAlertActionStyle, handler: (() -> Void)?) {
         self.title = title
         self.style = style
         self.handler = handler
@@ -98,32 +98,32 @@ class AOAlertAction {
 
 
 
-enum AOAlertControllerStyle {
+public enum AOAlertControllerStyle {
     case Alert, ActionSheet
 }
 
 
-class AOAlertController: UIViewController {
+public class AOAlertController: UIViewController {
     
-    var actionItemHeight: CGFloat = 44
-    var backgroundColor: UIColor?
-    var linesColor: UIColor?
-    var titleColor: UIColor?
-    var titleFont: UIFont? {
+    public var actionItemHeight: CGFloat = 44
+    public var backgroundColor: UIColor?
+    public var linesColor: UIColor?
+    public var titleColor: UIColor?
+    public var titleFont: UIFont? {
         didSet {
             if titleFont == nil { print("Error: title font is nil!") }
         }
     }
-    var messageColor: UIColor?
-    var messageFont: UIFont? {
+    public var messageColor: UIColor?
+    public var messageFont: UIFont? {
         didSet {
             if messageFont == nil { print("Error: message font is nil!") }
         }
     }
-    var tapBackgroundToDismiss: Bool?
+    public var tapBackgroundToDismiss: Bool?
     
     
-    init(title: String?, message: String?, style: AOAlertControllerStyle) {
+    public init(title: String?, message: String?, style: AOAlertControllerStyle) {
         self.alertTitle = title
         self.message = message
         self.style = style
@@ -132,7 +132,7 @@ class AOAlertController: UIViewController {
     }
     
     
-    func addAction(action: AOAlertAction) {
+    public func addAction(action: AOAlertAction) {
         self.actions.append(action)
     }
 
@@ -154,17 +154,17 @@ class AOAlertController: UIViewController {
     private var actions = [AOAlertAction]()
     
     
-    required init?(coder aDecoder: NSCoder) {
+    required public init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
     
-    override func didReceiveMemoryWarning() {
+    override public func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
     
     
-    override func viewDidLoad() {
+    override public func viewDidLoad() {
         super.viewDidLoad()
         
         self.view.backgroundColor = UIColor.blackColor().colorWithAlphaComponent(0.4)
@@ -198,7 +198,7 @@ class AOAlertController: UIViewController {
     }
     
     
-    override func viewDidAppear(animated: Bool) {
+    override public func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
         self.showUp()
     }
