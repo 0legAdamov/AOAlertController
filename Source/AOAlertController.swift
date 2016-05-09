@@ -148,7 +148,7 @@ public class AOAlertController: UIViewController {
     private var alertTitle: String?
     private let message: String?
     private let containerWidth: CGFloat = 270
-    private let contentOffset: CGFloat = 4
+    private let contentOffset: CGFloat = 0
     private let sheetHorizontalOffset: CGFloat = 10
     private let sheetBottomOffset: CGFloat = 9
     private var sheetYOffset: CGFloat = 0
@@ -157,6 +157,8 @@ public class AOAlertController: UIViewController {
     private var container = UIView()
     private var cancelContainer: UIView?
     private var actions = [AOAlertAction]()
+    private let topAndBottomOffset: CGFloat = 29
+    private let alertMessageSideOffset: CGFloat = 20
     
     
     required public init?(coder aDecoder: NSCoder) {
@@ -233,8 +235,8 @@ public class AOAlertController: UIViewController {
         let titleHeight = self.prefferedLabelHeight(text: self.alertTitle, font: titleFont, width: containerWidth - 2 * self.contentOffset)
         let messageHeight = self.prefferedLabelHeight(text: self.message, font: messageFont, width: containerWidth - 2 * self.contentOffset)
         var textBoxHeight = (titleHeight == 0 ? self.contentOffset : titleHeight + 2 * self.contentOffset) + (messageHeight == 0 ? 0 : messageHeight + self.contentOffset)
-        if textBoxHeight < self.containerMinHeight { textBoxHeight = self.containerMinHeight }
-        
+        textBoxHeight += topAndBottomOffset * 2
+
         var sheetCancelActionHeight: CGFloat = 0
         
         var allHeight: CGFloat = 0
@@ -295,9 +297,8 @@ public class AOAlertController: UIViewController {
         if let titleLabel = self.labelInFrame(titleFrame, text: self.alertTitle, font: titleFont, textColor: titleColor) {
             self.container.addSubview(titleLabel)
         }
-        
-        let messageYOffset = titleHeight == 0 ? (textBoxHeight - messageHeight)/2 : (titleYOffset + titleHeight + self.contentOffset)
-        let messageFrame = CGRect(x: self.contentOffset, y: messageYOffset, width: containerWidth - 2 * self.contentOffset, height: messageHeight)
+        let messageYOffset = self.topAndBottomOffset
+        let messageFrame = CGRect(x: self.alertMessageSideOffset, y: messageYOffset, width: containerWidth - 2 * self.alertMessageSideOffset, height: messageHeight)
         if let messageLabel = self.labelInFrame(messageFrame, text: self.message, font: messageFont, textColor: messageColor) {
             self.container.addSubview(messageLabel)
         }
