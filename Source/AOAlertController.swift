@@ -26,6 +26,9 @@ public class AOAlertSettings {
     public var defaultActionColor     = UIColor(red: 0, green: 0.48, blue: 1, alpha: 1)
     public var destructiveActionColor = UIColor(red: 1, green: 0.23, blue: 0.19, alpha: 1)
     public var cancelActionColor      = UIColor(red: 0, green: 0.48, blue: 1, alpha: 1)
+    public var actionBackgroundColor  = UIColor(red: 1, green: 1, blue: 1, alpha: 1)
+
+    public var blurredBackground      = false
     
     public var tapBackgroundToDismiss = false
 }
@@ -41,6 +44,7 @@ public class AOAlertAction {
     
     public var color: UIColor?
     public var font: UIFont?
+    public var backgroundColor: UIColor?
     
     public init(title: String, style: AOAlertActionStyle, handler: (() -> Void)?) {
         self.title = title
@@ -65,7 +69,7 @@ public class AOAlertAction {
         button.setTitleColor(textColor, forState: .Normal)
         button.setTitle(self.title, forState: .Normal)
         button.addTarget(self, action: #selector(AOAlertAction.buttonPressed), forControlEvents: .TouchUpInside)
-//        button.addTarget(self, action: "buttonPressed", forControlEvents: .TouchUpInside)
+        button.backgroundColor = self.backgroundColor ?? AOAlertSettings.sharedSettings.actionBackgroundColor
         self.completion = completion
         parentView.addSubview(button)
     }
@@ -109,6 +113,7 @@ public class AOAlertController: UIViewController {
     public var backgroundColor: UIColor?
     public var linesColor: UIColor?
     public var titleColor: UIColor?
+    public var blurredBackground: Bool?
     public var titleFont: UIFont? {
         didSet {
             if titleFont == nil { print("Error: title font is nil!") }
@@ -166,8 +171,17 @@ public class AOAlertController: UIViewController {
     
     override public func viewDidLoad() {
         super.viewDidLoad()
-        
-        self.view.backgroundColor = UIColor.blackColor().colorWithAlphaComponent(0.4)
+
+        let wantsblurredBackground = self.blurredBackground ?? AOAlertSettings.sharedSettings.blurredBackground
+        if (wantsblurredBackground) {
+            let blur = UIBlurEffect(style: .Light)
+            let blurredView = UIVisualEffectView(effect: blur)
+            blurredView.frame = self.view.frame
+            self.view.backgroundColor = UIColor.clearColor()
+            self.view.addSubview(blurredView)
+        } else {
+            self.view.backgroundColor = UIColor.blackColor().colorWithAlphaComponent(0.4)
+        }
         self.view.alpha = 0
         
         if self.alertTitle == nil && self.message == nil {
