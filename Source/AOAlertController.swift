@@ -26,6 +26,9 @@ public class AOAlertSettings {
     public var defaultActionColor     = UIColor(red: 0, green: 0.48, blue: 1, alpha: 1)
     public var destructiveActionColor = UIColor(red: 1, green: 0.23, blue: 0.19, alpha: 1)
     public var cancelActionColor      = UIColor(red: 0, green: 0.48, blue: 1, alpha: 1)
+    public var actionBackgroundColor  = UIColor(red: 1, green: 1, blue: 1, alpha: 1)
+
+    public var blurredBackground      = false
     
     public var tapBackgroundToDismiss = false
 }
@@ -41,6 +44,7 @@ public class AOAlertAction {
     
     public var color: UIColor?
     public var font: UIFont?
+    public var backgroundColor: UIColor?
     
     public init(title: String, style: AOAlertActionStyle, handler: (() -> Void)?) {
         self.title = title
@@ -65,7 +69,7 @@ public class AOAlertAction {
         button.setTitleColor(textColor, forState: .Normal)
         button.setTitle(self.title, forState: .Normal)
         button.addTarget(self, action: #selector(AOAlertAction.buttonPressed), forControlEvents: .TouchUpInside)
-//        button.addTarget(self, action: "buttonPressed", forControlEvents: .TouchUpInside)
+        button.backgroundColor = self.backgroundColor ?? AOAlertSettings.sharedSettings.actionBackgroundColor
         self.completion = completion
         parentView.addSubview(button)
     }
@@ -109,6 +113,7 @@ public class AOAlertController: UIViewController {
     public var backgroundColor: UIColor?
     public var linesColor: UIColor?
     public var titleColor: UIColor?
+    public var blurredBackground: Bool?
     public var titleFont: UIFont? {
         didSet {
             if titleFont == nil { print("Error: title font is nil!") }
@@ -136,6 +141,10 @@ public class AOAlertController: UIViewController {
         self.actions.append(action)
     }
 
+    override public func preferredStatusBarStyle() -> UIStatusBarStyle {
+        return .LightContent
+    }
+
     
     //MARK: - Private 
     
@@ -143,7 +152,7 @@ public class AOAlertController: UIViewController {
     private var alertTitle: String?
     private let message: String?
     private let containerWidth: CGFloat = 270
-    private let contentOffset: CGFloat = 4
+    private let contentOffset: CGFloat = 0
     private let sheetHorizontalOffset: CGFloat = 10
     private let sheetBottomOffset: CGFloat = 9
     private var sheetYOffset: CGFloat = 0
@@ -152,6 +161,8 @@ public class AOAlertController: UIViewController {
     private var container = UIView()
     private var cancelContainer: UIView?
     private var actions = [AOAlertAction]()
+    private let topAndBottomOffset: CGFloat = 29
+    private let alertMessageSideOffset: CGFloat = 20
     
     
     required public init?(coder aDecoder: NSCoder) {
@@ -166,8 +177,17 @@ public class AOAlertController: UIViewController {
     
     override public func viewDidLoad() {
         super.viewDidLoad()
-        
-        self.view.backgroundColor = UIColor.blackColor().colorWithAlphaComponent(0.4)
+
+        let wantsblurredBackground = self.blurredBackground ?? AOAlertSettings.sharedSettings.blurredBackground
+        if (wantsblurredBackground) {
+            let blur = UIBlurEffect(style: .Dark)
+            let blurredView = UIVisualEffectView(effect: blur)
+            blurredView.frame = self.view.frame
+            self.view.backgroundColor = UIColor.clearColor()
+            self.view.addSubview(blurredView)
+        } else {
+            self.view.backgroundColor = UIColor.blackColor().colorWithAlphaComponent(0.4)
+        }
         self.view.alpha = 0
         
         if self.alertTitle == nil && self.message == nil {
@@ -219,8 +239,8 @@ public class AOAlertController: UIViewController {
         let titleHeight = self.prefferedLabelHeight(text: self.alertTitle, font: titleFont, width: containerWidth - 2 * self.contentOffset)
         let messageHeight = self.prefferedLabelHeight(text: self.message, font: messageFont, width: containerWidth - 2 * self.contentOffset)
         var textBoxHeight = (titleHeight == 0 ? self.contentOffset : titleHeight + 2 * self.contentOffset) + (messageHeight == 0 ? 0 : messageHeight + self.contentOffset)
-        if textBoxHeight < self.containerMinHeight { textBoxHeight = self.containerMinHeight }
-        
+        textBoxHeight += topAndBottomOffset * 2
+
         var sheetCancelActionHeight: CGFloat = 0
         
         var allHeight: CGFloat = 0
@@ -281,9 +301,8 @@ public class AOAlertController: UIViewController {
         if let titleLabel = self.labelInFrame(titleFrame, text: self.alertTitle, font: titleFont, textColor: titleColor) {
             self.container.addSubview(titleLabel)
         }
-        
-        let messageYOffset = titleHeight == 0 ? (textBoxHeight - messageHeight)/2 : (titleYOffset + titleHeight + self.contentOffset)
-        let messageFrame = CGRect(x: self.contentOffset, y: messageYOffset, width: containerWidth - 2 * self.contentOffset, height: messageHeight)
+        let messageYOffset = self.topAndBottomOffset
+        let messageFrame = CGRect(x: self.alertMessageSideOffset, y: messageYOffset, width: containerWidth - 2 * self.alertMessageSideOffset, height: messageHeight)
         if let messageLabel = self.labelInFrame(messageFrame, text: self.message, font: messageFont, textColor: messageColor) {
             self.container.addSubview(messageLabel)
         }
