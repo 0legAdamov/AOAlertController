@@ -141,6 +141,10 @@ public class AOAlertController: UIViewController {
         self.actions.append(action)
     }
 
+    override public func preferredStatusBarStyle() -> UIStatusBarStyle {
+        return .LightContent
+    }
+
     
     //MARK: - Private 
     
@@ -176,7 +180,7 @@ public class AOAlertController: UIViewController {
 
         let wantsblurredBackground = self.blurredBackground ?? AOAlertSettings.sharedSettings.blurredBackground
         if (wantsblurredBackground) {
-            let blur = UIBlurEffect(style: .Light)
+            let blur = UIBlurEffect(style: .Dark)
             let blurredView = UIVisualEffectView(effect: blur)
             blurredView.frame = self.view.frame
             self.view.backgroundColor = UIColor.clearColor()
