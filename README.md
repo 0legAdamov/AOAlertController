@@ -1,5 +1,5 @@
 # AOAlertController
-[![Language](http://img.shields.io/badge/language-swift%202.2-brightgreen.svg?style=flat)]
+[![Language](http://img.shields.io/badge/language-swift%203.0-brightgreen.svg?style=flat)]
 (https://developer.apple.com/swift)
 [![CocoaPods compatible](http://img.shields.io/cocoapods/v/AOIntroViewController.svg?style=flat)]
 (https://cocoapods.org/pods/AOAlertController)
