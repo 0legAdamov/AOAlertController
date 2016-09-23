@@ -22,10 +22,10 @@ class ViewController: UITableViewController {
     }
 
 
-    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        switch indexPath.section {
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        switch (indexPath as NSIndexPath).section {
         case 0:
-            switch indexPath.row {
+            switch (indexPath as NSIndexPath).row {
             case 0: self.alertWithoutActions()
             case 1: self.alertOneAction()
             case 2: self.alertTwoActions()
@@ -33,7 +33,7 @@ class ViewController: UITableViewController {
             default: break
             }
         case 1:
-            switch indexPath.row {
+            switch (indexPath as NSIndexPath).row {
             case 0: self.sheetOneAction()
             case 1: self.sheetTwoActions()
             case 2: self.sheetThreeActions()
@@ -42,52 +42,52 @@ class ViewController: UITableViewController {
         default: break
         }
         
-        self.tableView.deselectRowAtIndexPath(indexPath, animated: true)
+        self.tableView.deselectRow(at: indexPath, animated: true)
     }
     
     // MARK: - alert style
     
     func alertWithoutActions() {
-        let alert = AOAlertController(title: "No actions", message: "Tap around the alert", style: .Alert)
-        self.navigationController?.presentViewController(alert, animated: false, completion: nil)
+        let alert = AOAlertController(title: "No actions", message: "Tap around the alert", style: .alert)
+        self.navigationController?.present(alert, animated: false, completion: nil)
     }
     
     func alertOneAction() {
-        let alert = AOAlertController(title: "One action", message: "One .Default action", style: .Alert)
-        alert.titleColor = UIColor.redColor()
+        let alert = AOAlertController(title: "One action", message: "One .Default action", style: .alert)
+        alert.titleColor = UIColor.red
         alert.titleFont = UIFont(name: "AvenirNext-Bold", size: 14)!
-        let action = AOAlertAction(title: "Done", style: .Default, handler: nil)
+        let action = AOAlertAction(title: "Done", style: .default, handler: nil)
         alert.addAction(action)
-        self.navigationController?.presentViewController(alert, animated: false, completion: nil)
+        self.navigationController?.present(alert, animated: false, completion: nil)
     }
     
     func alertTwoActions() {
-        let alert = AOAlertController(title: "Two actions", message: nil, style: .Alert)
-        let actionDef   = AOAlertAction(title: "Default", style: .Default, handler: nil)
-        let actionCancel = AOAlertAction(title: "Cancel", style: .Cancel, handler: nil)
-        actionCancel.color = UIColor.orangeColor()
+        let alert = AOAlertController(title: "Two actions", message: nil, style: .alert)
+        let actionDef   = AOAlertAction(title: "Default", style: .default, handler: nil)
+        let actionCancel = AOAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        actionCancel.color = UIColor.orange
         alert.addAction(actionDef)
         alert.addAction(actionCancel)
-        self.navigationController?.presentViewController(alert, animated: false, completion: nil)
+        self.navigationController?.present(alert, animated: false, completion: nil)
     }
     
     
     func alertThreeActions() {
-        let alert = AOAlertController(title: "Three actions", message: "With .Destructive and\n.Cancel actions", style: .Alert)
+        let alert = AOAlertController(title: "Three actions", message: "With .Destructive and\n.Cancel actions", style: .alert)
         alert.backgroundColor = UIColor(red: 0.28, green: 0.28, blue: 0.28, alpha: 1)
-        alert.titleColor = UIColor.whiteColor()
-        alert.messageColor = UIColor.lightGrayColor()
-        alert.linesColor = UIColor.darkGrayColor()
-        let action1 = AOAlertAction(title: "Remove", style: .Destructive, handler: nil)
-        action1.color = UIColor.whiteColor()
-        let action2 = AOAlertAction(title: "Remove all", style: .Destructive, handler: nil)
-        action2.color = UIColor.whiteColor()
-        let cancelAction = AOAlertAction(title: "Cancel", style: .Cancel, handler: nil)
-        cancelAction.color = UIColor.whiteColor()
+        alert.titleColor = UIColor.white
+        alert.messageColor = UIColor.lightGray
+        alert.linesColor = UIColor.darkGray
+        let action1 = AOAlertAction(title: "Remove", style: .destructive, handler: nil)
+        action1.color = UIColor.white
+        let action2 = AOAlertAction(title: "Remove all", style: .destructive, handler: nil)
+        action2.color = UIColor.white
+        let cancelAction = AOAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        cancelAction.color = UIColor.white
         alert.addAction(cancelAction)
         alert.addAction(action1)
         alert.addAction(action2)
-        self.navigationController?.presentViewController(alert, animated: false, completion: nil)
+        self.navigationController?.present(alert, animated: false, completion: nil)
     }
     
     
@@ -95,40 +95,40 @@ class ViewController: UITableViewController {
     
     
     func sheetOneAction() {
-        let alert = AOAlertController(title: "One action", message: "default appearance", style: .ActionSheet)
-        let cancel = AOAlertAction(title: "Cancel", style: .Cancel, handler: nil)
+        let alert = AOAlertController(title: "One action", message: "default appearance", style: .actionSheet)
+        let cancel = AOAlertAction(title: "Cancel", style: .cancel, handler: nil)
         alert.addAction(cancel)
-        self.navigationController?.presentViewController(alert, animated: false, completion: nil)
+        self.navigationController?.present(alert, animated: false, completion: nil)
     }
     
     
     func sheetTwoActions() {
-        let alert = AOAlertController(title: "Two actions", message: "custom actions color", style: .ActionSheet)
-        let action1 = AOAlertAction(title: "Action 1", style: .Default, handler: nil)
-        action1.color = UIColor.orangeColor()
-        let action2 = AOAlertAction(title: "Action 2", style: .Default, handler: nil)
-        action2.color = UIColor.darkGrayColor()
+        let alert = AOAlertController(title: "Two actions", message: "custom actions color", style: .actionSheet)
+        let action1 = AOAlertAction(title: "Action 1", style: .default, handler: nil)
+        action1.color = UIColor.orange
+        let action2 = AOAlertAction(title: "Action 2", style: .default, handler: nil)
+        action2.color = UIColor.darkGray
         alert.addAction(action1)
         alert.addAction(action2)
-        self.navigationController?.presentViewController(alert, animated: false, completion: nil)
+        self.navigationController?.present(alert, animated: false, completion: nil)
     }
     
     
     func sheetThreeActions() {
-        let alert = AOAlertController(title: "Three actions", message: nil, style: .ActionSheet)
+        let alert = AOAlertController(title: "Three actions", message: nil, style: .actionSheet)
         alert.backgroundColor = UIColor(red: 0.28, green: 0.28, blue: 0.28, alpha: 1)
-        alert.linesColor = UIColor.darkGrayColor()
-        alert.titleColor = UIColor.whiteColor()
-        let defaultAction = AOAlertAction(title: "Default action", style: .Default, handler: nil)
-        defaultAction.color = UIColor.lightGrayColor()
-        let cancelAction = AOAlertAction(title: "Cancel", style: .Cancel, handler: nil)
-        cancelAction.color = UIColor.yellowColor()
-        let destrAction = AOAlertAction(title: "Destructive", style: .Destructive, handler: nil)
-        destrAction.color = UIColor.orangeColor()
+        alert.linesColor = UIColor.darkGray
+        alert.titleColor = UIColor.white
+        let defaultAction = AOAlertAction(title: "Default action", style: .default, handler: nil)
+        defaultAction.color = UIColor.lightGray
+        let cancelAction = AOAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        cancelAction.color = UIColor.yellow
+        let destrAction = AOAlertAction(title: "Destructive", style: .destructive, handler: nil)
+        destrAction.color = UIColor.orange
         alert.addAction(defaultAction)
         alert.addAction(cancelAction)
         alert.addAction(destrAction)
-        self.navigationController?.presentViewController(alert, animated: false, completion: nil)
+        self.navigationController?.present(alert, animated: false, completion: nil)
     }
 }
 
